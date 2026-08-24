@@ -53,7 +53,8 @@ Konfidenzstufen in den Dokumenten:
 | Schema (`supabase/migrations/`) | 6 Migrationen, gegen echten Postgres ausgeführt |
 | Mandantentrennung | 7 Durchgriffsversuche werden abgewehrt |
 | GoBD | Festschreibung, Unveränderbarkeit, lückenlose Nummern, Journal |
-| Supabase-Projekt | **noch nicht angelegt** — siehe unten |
+| Supabase-Projekt | `gewerk-crm`, Region `eu-central-1`, Postgres 17 |
+| Schema auf Supabase | 7 Migrationen angewendet, Linter meldet nur noch einen beabsichtigten Hinweis |
 
 ```bash
 ./scripts/db-test.sh     # Datenbank neu bauen, Migrationen, Tests, Kontrastwerte
@@ -63,3 +64,33 @@ Der Testlauf braucht einen lokalen Postgres. `supabase/local/00_shim.sql` bildet
 nach, was Supabase mitbringt (auth-Schema, `auth.uid()`, die Rollen `anon`,
 `authenticated`, `service_role`) — diese Datei wird **nie** auf ein
 Supabase-Projekt angewendet.
+
+### Sicherheitsprüfung
+
+Supabases eigener Datenbank-Linter läuft zusätzlich zu den Tests, weil er Dinge
+sieht, die lokal nicht auffallen — etwa welche Funktionen über die
+REST-Schnittstelle erreichbar sind. Er meldete fünf Punkte, `0007_haertung.sql`
+behebt vier davon:
+
+- `btree_gist` lag im Schema `public`, das die API ausliefert → nach `extensions` verschoben
+- `journal_schreiben()` war als `security definer` für `anon` und `authenticated`
+  über `/rest/v1/rpc/` aufrufbar → Ausführungsrecht vollständig entzogen
+- `meine_betriebe()` war für `anon` aufrufbar → entzogen
+
+Der verbleibende Hinweis ist **beabsichtigt**: `meine_betriebe()` muss für
+`authenticated` ausführbar bleiben, weil jede RLS-Policy sie aufruft. Ein
+Direktaufruf liefert nur die eigenen Betriebe des Aufrufers zurück — also
+nichts, was er nicht ohnehin weiß.
+
+### Verbindungsdaten
+
+Projekt-Ref und Schlüssel gehören in `.env.local`, nicht ins Repository:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable key>
+```
+
+Der `service_role`-Schlüssel wird **nie** an den Client ausgeliefert und ist im
+Anwendungscode nicht vorgesehen — die Mandantentrennung hängt daran, dass alle
+Zugriffe über die Rolle `authenticated` und damit durch RLS laufen.
