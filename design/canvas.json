@@ -1,31 +1,24 @@
 {
   "artboards": [
-    { "file": "Main.dc.html",             "title": "A · Werkstatt — Baustellendoku (Mobil)", "x": 0,   "y": 0,    "w": 390,  "h": 844 },
-    { "file": "WerkstattAngebot.dc.html", "title": "A · Werkstatt — Angebot (Desktop)",      "x": 520, "y": 0,    "w": 1440, "h": 900 },
-    { "file": "AufmassDoku.dc.html",      "title": "B · Aufmaß — Baustellendoku (Mobil)",    "x": 0,   "y": 1160, "w": 390,  "h": 844 },
-    { "file": "AufmassAngebot.dc.html",   "title": "B · Aufmaß — Angebot (Desktop)",         "x": 520, "y": 1160, "w": 1440, "h": 900 }
+    { "file": "Main.dc.html",                 "title": "Angebot · Nacht (Desktop)", "x": 0,    "y": 0,    "w": 1440, "h": 900 },
+    { "file": "AngebotTag.dc.html",           "title": "Angebot · Tag (Desktop)",   "x": 1560, "y": 0,    "w": 1440, "h": 900 },
+    { "file": "ThemeTokens.dc.html",          "title": "Farbrollen Tag / Nacht",    "x": 0,    "y": 1120, "w": 1000, "h": 830 },
+    { "file": "BaustellendokuMobil.dc.html",  "title": "Baustellendoku (Mobil)",    "x": 1120, "y": 1120, "w": 390,  "h": 844 }
   ],
   "annotations": [
     {
-      "id": "richtung-a",
+      "id": "tag-nacht",
       "x": 0,
-      "y": -210,
-      "w": 900,
-      "text": "RICHTUNG A · WERKSTATT — Anthrazit + Signalgelb, Barlow Condensed\n\nDafür: maximaler Kontrast bei direkter Sonne. Unverwechselbar im Handwerksumfeld — kein Wettbewerber sieht so aus. Dunkle Flächen sparen Akku auf OLED-Handys, und der Monteur erkennt den Offline-Balken sofort.\n\nDagegen: dunkle Oberflächen ermüden über einen ganzen Bürotag. Angebots-PDFs brauchen ohnehin ein helles Thema, also zwei Themes zu pflegen. Gelb ist als einzige Akzentfarbe schon für Warnungen belegt — für Status bleibt wenig Spielraum."
+      "y": -260,
+      "w": 1000,
+      "text": "TAG UND NACHT — derselbe Bildschirm, umschaltbar über das Sonne/Mond-Paar oben rechts.\n\nBeide Modi teilen Struktur, Typografie, Abstände und Spaltenraster vollständig. Es wechseln nur 13 Farbrollen, siehe die Übersicht unten links.\n\nDie eine Rolle, die nicht einfach heller wird: Signalgelb erreicht auf Weiß nur 1,56:1 und ist als Schrift unlesbar. Im Tag-Modus bleibt Gelb Fläche — Buttons, Titelbalken, Diagramm — und weicht als Schrift auf Bernstein #8A6100 aus."
     },
     {
-      "id": "richtung-b",
-      "x": 0,
-      "y": 950,
-      "w": 900,
-      "text": "RICHTUNG B · AUFMASS — Weiß + Tiefblau, IBM Plex Sans/Mono\n\nDafür: ruhig über lange Bürositzungen. Zahlen in IBM Plex Mono stehen spaltenweise exakt untereinander — bei Positionslisten und Summen ein echter Lesbarkeitsgewinn. Die Statusfarben Gelb/Grün/Rot bleiben frei für ihre eigentliche Bedeutung. Ein Angebots-PDF sieht aus wie der Bildschirm.\n\nDagegen: wirkt austauschbarer und liegt näher an dem, was plancraft und HERO schon machen. Auf der Baustelle blendet die helle Fläche bei direkter Sonne stärker als Richtung A."
-    },
-    {
-      "id": "hinweis-scope",
-      "x": 1500,
-      "y": -210,
-      "w": 460,
-      "text": "Beide Richtungen zeigen denselben Bildschirm, damit der Vergleich ehrlich ist.\n\nGemeinsam in beiden: Touch-Flächen ab 44 px, sichtbarer Offline-Status statt stiller Warteschlange, Lohn- und Materialanteil je Position getrennt (bei plancraft erst ab 139,90 €/Monat).\n\nNach deiner Wahl baue ich die sechs Detailansichten: Baustellendoku, Zeiterfassung, Angebot, Disposition, Dashboard, Design-System."
+      "id": "korrekturen",
+      "x": 1560,
+      "y": -260,
+      "w": 1000,
+      "text": "KORRIGIERT GEGENÜBER DEM ERSTEN ENTWURF\n\n• Die Kalkulationsaufteilung war falsch: Lohn 5.209,60 € statt 4.974,40 €, Material 7.880,80 € statt 8.116,00 €, Verhältnis 39,8/60,2 statt 38/62. Beide Werte addierten sich zwar zum richtigen Netto, waren aber je um 235,20 € gegenläufig verschoben.\n• Lohnstunden jetzt aus dem Lohnanteil abgeleitet: 5.209,60 € ÷ 55,00 €/h = 94,72 h.\n• Euro-Zeichen in Spaltenköpfen und Summen ergänzt.\n• Zahlenspalten verschmälert, damit die Positionsbezeichnung von 136 px auf ~180 px Textbreite kommt.\n• Mobil: 24.08.2026 ist ein Montag, nicht Dienstag. Und der Offline-Balken meldete drei wartende Einträge, die Liste zeigte nur einen — jetzt stimmen beide überein."
     }
   ],
   "launch": { "view": "canvas" }
