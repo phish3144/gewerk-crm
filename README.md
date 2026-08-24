@@ -44,3 +44,22 @@ Konfidenzstufen in den Dokumenten:
 | E-Rechnung | Erzeugung + Versand ab MVP; **Validierung vertagt** (kein Java-Sidecar) |
 | Compliance | E-Rechnung, GoBD, DATEV-Export |
 | Budget | Prototyp auf Free-Tiers; jede Kostenschwelle ist im Plan markiert |
+
+## Phase 0 — Stand
+
+| | Zustand |
+|---|---|
+| Design-Tokens (`app/tokens.css`) | 13 Rollen, Tag und Nacht, 21 Kontrastpaare nachgerechnet |
+| Schema (`supabase/migrations/`) | 6 Migrationen, gegen echten Postgres ausgeführt |
+| Mandantentrennung | 7 Durchgriffsversuche werden abgewehrt |
+| GoBD | Festschreibung, Unveränderbarkeit, lückenlose Nummern, Journal |
+| Supabase-Projekt | **noch nicht angelegt** — siehe unten |
+
+```bash
+./scripts/db-test.sh     # Datenbank neu bauen, Migrationen, Tests, Kontrastwerte
+```
+
+Der Testlauf braucht einen lokalen Postgres. `supabase/local/00_shim.sql` bildet
+nach, was Supabase mitbringt (auth-Schema, `auth.uid()`, die Rollen `anon`,
+`authenticated`, `service_role`) — diese Datei wird **nie** auf ein
+Supabase-Projekt angewendet.
