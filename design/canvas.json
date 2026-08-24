@@ -1,25 +1,55 @@
 {
+  "pages": [
+    { "id": "anwendung", "name": "Anwendung" },
+    { "id": "mobil",     "name": "Baustelle" },
+    { "id": "system",    "name": "Design-System" }
+  ],
   "artboards": [
-    { "file": "Main.dc.html",                 "title": "Angebot · Nacht (Desktop)", "x": 0,    "y": 0,    "w": 1440, "h": 900 },
-    { "file": "AngebotTag.dc.html",           "title": "Angebot · Tag (Desktop)",   "x": 1560, "y": 0,    "w": 1440, "h": 900 },
-    { "file": "ThemeTokens.dc.html",          "title": "Farbrollen Tag / Nacht",    "x": 0,    "y": 1120, "w": 1000, "h": 830 },
-    { "file": "BaustellendokuMobil.dc.html",  "title": "Baustellendoku (Mobil)",    "x": 1120, "y": 1120, "w": 390,  "h": 844 }
+    { "file": "Dashboard.dc.html",           "title": "Übersicht",             "page": "anwendung", "x": 0,    "y": 0,    "w": 1440, "h": 900 },
+    { "file": "Disposition.dc.html",         "title": "Plantafel",             "page": "anwendung", "x": 1560, "y": 0,    "w": 1440, "h": 900 },
+    { "file": "Material.dc.html",            "title": "Artikelstamm",          "page": "anwendung", "x": 3120, "y": 0,    "w": 1440, "h": 900 },
+    { "file": "Main.dc.html",                "title": "Angebot · Nacht",       "page": "anwendung", "x": 0,    "y": 1040, "w": 1440, "h": 900 },
+    { "file": "AngebotTag.dc.html",          "title": "Angebot · Tag",         "page": "anwendung", "x": 1560, "y": 1040, "w": 1440, "h": 900 },
+
+    { "file": "BaustellendokuMobil.dc.html", "title": "Baustellendoku",        "page": "mobil",     "x": 0,    "y": 0,    "w": 390,  "h": 844 },
+    { "file": "Zeiterfassung.dc.html",       "title": "Zeiterfassung",         "page": "mobil",     "x": 510,  "y": 0,    "w": 390,  "h": 844 },
+
+    { "file": "ThemeTokens.dc.html",         "title": "Farbrollen Tag / Nacht","page": "system",    "x": 0,    "y": 0,    "w": 1000, "h": 830 },
+    { "file": "Komponenten.dc.html",         "title": "Bausteine",             "page": "system",    "x": 1120, "y": 0,    "w": 1020, "h": 1180 }
   ],
   "annotations": [
     {
-      "id": "tag-nacht",
+      "id": "anwendung-note",
+      "page": "anwendung",
       "x": 0,
-      "y": -260,
+      "y": -300,
       "w": 1000,
-      "text": "TAG UND NACHT — derselbe Bildschirm, umschaltbar über das Sonne/Mond-Paar oben rechts.\n\nBeide Modi teilen Struktur, Typografie, Abstände und Spaltenraster vollständig. Es wechseln nur 13 Farbrollen, siehe die Übersicht unten links.\n\nDie eine Rolle, die nicht einfach heller wird: Signalgelb erreicht auf Weiß nur 1,56:1 und ist als Schrift unlesbar. Im Tag-Modus bleibt Gelb Fläche — Buttons, Titelbalken, Diagramm — und weicht als Schrift auf Bernstein #8A6100 aus."
+      "text": "DIE FÜNF ANSICHTEN\n\nÜbersicht · Plantafel · Artikelstamm oben, das Angebot in beiden Modi darunter. Die Baustellen-Ansichten liegen auf der Seite »Baustelle«, Farbrollen und Bausteine auf »Design-System«.\n\nDatenfarben sind bewusst NICHT die UI-Akzente. Signalgelb #FFC72C liegt bei OKLCH L 0.857 und damit weit außerhalb des Bandes für Datenmarken auf dunklem Grund (0.48–0.67). Die Kolonnenfarben auf der Plantafel stammen aus einem validierten Satz: alle vier innerhalb des Bandes, alle ≥3:1 auf der Fläche, schlechtestes Farbfehlsichtigkeits-Paar ΔE 8.4. Der Subunternehmer trägt zusätzlich eine Schraffur — Fremdleistung soll man erkennen, ohne Farben vergleichen zu müssen."
     },
     {
-      "id": "korrekturen",
-      "x": 1560,
-      "y": -260,
-      "w": 1000,
-      "text": "KORRIGIERT GEGENÜBER DEM ERSTEN ENTWURF\n\n• Die Kalkulationsaufteilung war falsch: Lohn 5.209,60 € statt 4.974,40 €, Material 7.880,80 € statt 8.116,00 €, Verhältnis 39,8/60,2 statt 38/62. Beide Werte addierten sich zwar zum richtigen Netto, waren aber je um 235,20 € gegenläufig verschoben.\n• Lohnstunden jetzt aus dem Lohnanteil abgeleitet: 5.209,60 € ÷ 55,00 €/h = 94,72 h.\n• Euro-Zeichen in Spaltenköpfen und Summen ergänzt.\n• Zahlenspalten verschmälert, damit die Positionsbezeichnung von 136 px auf ~180 px Textbreite kommt.\n• Mobil: 24.08.2026 ist ein Montag, nicht Dienstag. Und der Offline-Balken meldete drei wartende Einträge, die Liste zeigte nur einen — jetzt stimmen beide überein."
+      "id": "uebersicht-note",
+      "page": "anwendung",
+      "x": 1060,
+      "y": -300,
+      "w": 940,
+      "text": "WARUM DIESE KENNZAHLEN\n\nKeine Umsatzkurve, kein Auftragseingang nach Monat. Die vier Kacheln zeigen ausschließlich, wo heute Geld oder Kapazität verloren geht: unbeantwortete Angebote, überfällige Forderungen, nicht abgerechnete Stunden, Überbuchung.\n\nDie Forderungen nach Alter sind eine Serie und werden über die Balkenlänge gelesen, nicht über Farbe — deshalb ein einziger Farbton und keine Legende. Der kritische Eimer trägt ein Abzeichen mit Text statt einer abweichenden Balkenfarbe.\n\nDie Zahlen sind untereinander konsistent gerechnet: 8.120 + 2.960 + 1.400 = 12.480 € überfällig, wie in der Kachel."
+    },
+    {
+      "id": "mobil-note",
+      "page": "mobil",
+      "x": 0,
+      "y": -240,
+      "w": 900,
+      "text": "BAUSTELLE\n\nBeide Bildschirme führen genau eine Hauptaktion: Foto aufnehmen bzw. Stoppen. Diese Fläche ist 76 px hoch, alles andere ordnet sich unter.\n\nDer Offline-Zustand wird angezeigt, nicht verschwiegen — Zahl der wartenden Einträge im Balken oben, Status je Eintrag in der Liste. Eine stille Warteschlange ist der häufigste Vertrauensbruch mobiler Baustellen-Apps."
+    },
+    {
+      "id": "system-note",
+      "page": "system",
+      "x": 0,
+      "y": -240,
+      "w": 900,
+      "text": "DESIGN-SYSTEM\n\nLinks die 13 Farbrollen, die zwischen Tag und Nacht wechseln, mit nachgerechneten Kontrastwerten. Rechts Typografie, Flächengrößen und die Komponenten in beiden Modi nebeneinander.\n\nNächster Schritt hier: diese Rollen als CSS Custom Properties ausschreiben, dann ist der Umschalter Code statt zweier Entwürfe."
     }
   ],
-  "launch": { "view": "canvas" }
+  "launch": { "view": "canvas", "page": "anwendung" }
 }
