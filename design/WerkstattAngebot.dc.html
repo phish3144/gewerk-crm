@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+  <style>
+    body { margin: 0; font-family: Barlow, "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #FFC72C; text-decoration: none; }
+    a:hover { color: #FFD866; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; background: #17191B; color: #F4F6F7; display: flex; overflow: hidden;">
+
+  <div style="width: 232px; flex-shrink: 0; background: #121415; border-right: 1px solid #2A2E32; display: flex; flex-direction: column; padding: 20px 0;">
+    <div style="padding: 0 20px 24px; display: flex; align-items: center; gap: 10px;">
+      <div style="width: 32px; height: 32px; border-radius: 7px; background: #FFC72C; display: flex; align-items: center; justify-content: center;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#17191B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l6-6"></path><path d="M13 7l4 4"></path><path d="M9.5 10.5L14 6a3.5 3.5 0 014.9 4.9L14.4 15.4z"></path></svg>
+      </div>
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 21px; letter-spacing: 0.03em;">GEWERK</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 2px; padding: 0 12px;">
+      <div style="display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 8px; color: #98A1A8;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#98A1A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5.5 9.5V20h13V9.5"></path></svg>
+        <span style="font-size: 15px;">&Uuml;bersicht</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 8px; background: #2A2E32; color: #FFC72C;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FFC72C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h10l4 4v14H5z"></path><path d="M9 12h6"></path><path d="M9 16h4"></path></svg>
+        <span style="font-size: 15px; font-weight: 600;">Belege</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 8px; color: #98A1A8;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#98A1A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18"></path><path d="M3 12h18"></path><path d="M3 19h12"></path></svg>
+        <span style="font-size: 15px;">Auftr&auml;ge</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 8px; color: #98A1A8;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#98A1A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4"></path><path d="M16 3v4"></path><path d="M3 10h18"></path></svg>
+        <span style="font-size: 15px;">Planung</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 8px; color: #98A1A8;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#98A1A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-4 9 4-9 4z"></path><path d="M3 12l9 4 9-4"></path><path d="M3 16l9 4 9-4"></path></svg>
+        <span style="font-size: 15px;">Material</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0;">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; border-bottom: 1px solid #2A2E32;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 30px; letter-spacing: 0.01em;">ANGEBOT</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: #98A1A8; padding-top: 4px;">2026-00184</div>
+          <div style="background: #3A2E10; color: #FFC72C; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px;">Entwurf</div>
+        </div>
+        <div style="font-size: 15px; color: #98A1A8; margin-top: 2px;">Stadt Musterhausen &middot; Kita Ahornweg, Bauabschnitt 2</div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <div style="border: 1px solid #383D42; border-radius: 8px; padding: 11px 18px; font-size: 15px; font-weight: 500;">Vorschau</div>
+        <div style="background: #FFC72C; color: #17191B; border-radius: 8px; padding: 11px 20px; font-size: 15px; font-weight: 600;">Festschreiben</div>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; gap: 24px; padding: 24px 32px; min-height: 0;">
+
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column;">
+        <div style="display: grid; grid-template-columns: 48px 1fr 84px 64px 104px 104px 104px 116px; gap: 0; padding: 0 14px 10px; border-bottom: 1px solid #2A2E32;">
+          <div style="font-size: 12px; font-weight: 600; color: #6F7A81; letter-spacing: 0.08em;">POS</div>
+          <div style="font-size: 12px; font-weight: 600; color: #6F7A81; letter-spacing: 0.08em;">BEZEICHNUNG</div>
+          <div style="font-size: 12px; font-weight: 600; color: #6F7A81; letter-spacing: 0.08em; text-align: right;">MENGE</div>
+          <div style="font-size: 12px; font-weight: 600; color: #6F7A81; letter-spacing: 0.08em; text-align: right;">EINH</div>
+          <div style="font-size: 12px; font-weight: 600; color: #6F7A81; letter-spacing: 0.08em; text-align: right;">E-PREIS</div>
+          <div style="font-size: 12px; font-weight: 600; color: #FFC72C; letter-spacing: 0.08em; text-align: right;">LOHN</div>
+          <div style="font-size: 12px; font-weight: 600; color: #7FB5FF; letter-spacing: 0.08em; text-align: right;">MATERIAL</div>
+          <div style="font-size: 12px; font-weight: 600; color: #6F7A81; letter-spacing: 0.08em; text-align: right;">GESAMT</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+
+          <div style="padding: 12px 14px; background: #212528; border-left: 3px solid #FFC72C; margin-top: 8px; border-radius: 0 6px 6px 0;">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 0.04em; color: #FFC72C;">TITEL 1 &middot; ELEKTROINSTALLATION ROHBAU</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 48px 1fr 84px 64px 104px 104px 104px 116px; align-items: center; padding: 13px 14px; border-bottom: 1px solid #212528;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #98A1A8;">1.1</div>
+            <div style="font-size: 15px; padding-right: 16px;">Leerrohr M25 unter Putz verlegen</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">420,00</div>
+            <div style="font-size: 14px; color: #98A1A8; text-align: right;">m</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">7,80</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #FFC72C;">5,20</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #7FB5FF;">2,60</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; text-align: right;">3.276,00</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 48px 1fr 84px 64px 104px 104px 104px 116px; align-items: center; padding: 13px 14px; border-bottom: 1px solid #212528;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #98A1A8;">1.2</div>
+            <div style="font-size: 15px; padding-right: 16px;">Schalterdose UP setzen, inkl. Bohrung</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">96,00</div>
+            <div style="font-size: 14px; color: #98A1A8; text-align: right;">St</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">12,40</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #FFC72C;">9,60</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #7FB5FF;">2,80</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; text-align: right;">1.190,40</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 48px 1fr 84px 64px 104px 104px 104px 116px; align-items: center; padding: 13px 14px; border-bottom: 1px solid #212528; background: #1D2023;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #98A1A8;">1.3</div>
+            <div style="font-size: 15px; padding-right: 16px;">Unterverteilung 3-reihig, 36 TE, montiert</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">2,00</div>
+            <div style="font-size: 14px; color: #98A1A8; text-align: right;">St</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">1.480,00</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #FFC72C;">380,00</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #7FB5FF;">1.100,00</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; text-align: right;">2.960,00</div>
+          </div>
+
+          <div style="padding: 12px 14px; background: #212528; border-left: 3px solid #FFC72C; margin-top: 14px; border-radius: 0 6px 6px 0;">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 0.04em; color: #FFC72C;">TITEL 2 &middot; BELEUCHTUNG</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 48px 1fr 84px 64px 104px 104px 104px 116px; align-items: center; padding: 13px 14px; border-bottom: 1px solid #212528;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #98A1A8;">2.1</div>
+            <div style="font-size: 15px; padding-right: 16px;">LED-Panel 600x600, 36 W, inkl. Anschluss</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">48,00</div>
+            <div style="font-size: 14px; color: #98A1A8; text-align: right;">St</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right;">118,00</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #FFC72C;">28,00</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right; color: #7FB5FF;">90,00</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; text-align: right;">5.664,00</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px; padding: 16px 14px; color: #FFC72C;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC72C" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            <span style="font-size: 15px; font-weight: 600;">Position hinzuf&uuml;gen</span>
+            <span style="font-size: 14px; color: #6F7A81; margin-left: 6px;">oder aus Artikelstamm w&auml;hlen</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="width: 316px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px;">
+
+        <div style="background: #212528; border: 1px solid #2A2E32; border-radius: 12px; padding: 20px;">
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.08em; color: #6F7A81; margin-bottom: 16px;">SUMMEN</div>
+          <div style="display: flex; flex-direction: column; gap: 11px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="font-size: 15px; color: #98A1A8;">Netto</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px;">13.090,40</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="font-size: 15px; color: #98A1A8;">USt 19 %</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px;">2.487,18</span>
+            </div>
+            <div style="height: 1px; background: #383D42; margin: 4px 0;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px;">BRUTTO</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 500; color: #FFC72C;">15.577,58</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: #212528; border: 1px solid #2A2E32; border-radius: 12px; padding: 20px;">
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.08em; color: #6F7A81; margin-bottom: 16px;">KALKULATION</div>
+          <div style="display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin-bottom: 14px;">
+            <div style="width: 38%; background: #FFC72C;"></div>
+            <div style="width: 62%; background: #7FB5FF;"></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 10px; height: 10px; border-radius: 3px; background: #FFC72C;"></div>
+                <span style="font-size: 15px; color: #98A1A8;">Lohnanteil</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">4.974,40</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 10px; height: 10px; border-radius: 3px; background: #7FB5FF;"></div>
+                <span style="font-size: 15px; color: #98A1A8;">Materialanteil</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">8.116,00</span>
+            </div>
+            <div style="height: 1px; background: #383D42; margin: 2px 0;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 15px; color: #98A1A8;">Lohnstunden</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">106,4 h</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: #1D2023; border: 1px solid #2A2E32; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 12px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5FD08A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M12 3l7.5 4v5c0 4.4-3.1 8.4-7.5 9.5C7.6 20.4 4.5 16.4 4.5 12V7z"></path><path d="M9 12l2 2 4-4"></path></svg>
+          <div>
+            <div style="font-size: 14px; font-weight: 600; color: #5FD08A;">Bereit f&uuml;r E-Rechnung</div>
+            <div style="font-size: 13px; color: #6F7A81;">Alle Pflichtangaben vollst&auml;ndig</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

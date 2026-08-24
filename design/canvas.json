@@ -1,0 +1,32 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html",             "title": "A · Werkstatt — Baustellendoku (Mobil)", "x": 0,   "y": 0,    "w": 390,  "h": 844 },
+    { "file": "WerkstattAngebot.dc.html", "title": "A · Werkstatt — Angebot (Desktop)",      "x": 520, "y": 0,    "w": 1440, "h": 900 },
+    { "file": "AufmassDoku.dc.html",      "title": "B · Aufmaß — Baustellendoku (Mobil)",    "x": 0,   "y": 1160, "w": 390,  "h": 844 },
+    { "file": "AufmassAngebot.dc.html",   "title": "B · Aufmaß — Angebot (Desktop)",         "x": 520, "y": 1160, "w": 1440, "h": 900 }
+  ],
+  "annotations": [
+    {
+      "id": "richtung-a",
+      "x": 0,
+      "y": -210,
+      "w": 900,
+      "text": "RICHTUNG A · WERKSTATT — Anthrazit + Signalgelb, Barlow Condensed\n\nDafür: maximaler Kontrast bei direkter Sonne. Unverwechselbar im Handwerksumfeld — kein Wettbewerber sieht so aus. Dunkle Flächen sparen Akku auf OLED-Handys, und der Monteur erkennt den Offline-Balken sofort.\n\nDagegen: dunkle Oberflächen ermüden über einen ganzen Bürotag. Angebots-PDFs brauchen ohnehin ein helles Thema, also zwei Themes zu pflegen. Gelb ist als einzige Akzentfarbe schon für Warnungen belegt — für Status bleibt wenig Spielraum."
+    },
+    {
+      "id": "richtung-b",
+      "x": 0,
+      "y": 950,
+      "w": 900,
+      "text": "RICHTUNG B · AUFMASS — Weiß + Tiefblau, IBM Plex Sans/Mono\n\nDafür: ruhig über lange Bürositzungen. Zahlen in IBM Plex Mono stehen spaltenweise exakt untereinander — bei Positionslisten und Summen ein echter Lesbarkeitsgewinn. Die Statusfarben Gelb/Grün/Rot bleiben frei für ihre eigentliche Bedeutung. Ein Angebots-PDF sieht aus wie der Bildschirm.\n\nDagegen: wirkt austauschbarer und liegt näher an dem, was plancraft und HERO schon machen. Auf der Baustelle blendet die helle Fläche bei direkter Sonne stärker als Richtung A."
+    },
+    {
+      "id": "hinweis-scope",
+      "x": 1500,
+      "y": -210,
+      "w": 460,
+      "text": "Beide Richtungen zeigen denselben Bildschirm, damit der Vergleich ehrlich ist.\n\nGemeinsam in beiden: Touch-Flächen ab 44 px, sichtbarer Offline-Status statt stiller Warteschlange, Lohn- und Materialanteil je Position getrennt (bei plancraft erst ab 139,90 €/Monat).\n\nNach deiner Wahl baue ich die sechs Detailansichten: Baustellendoku, Zeiterfassung, Angebot, Disposition, Dashboard, Design-System."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}
