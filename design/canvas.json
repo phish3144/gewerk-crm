@@ -1,21 +1,100 @@
 {
   "pages": [
-    { "id": "anwendung", "name": "Anwendung" },
-    { "id": "mobil",     "name": "Baustelle" },
-    { "id": "system",    "name": "Design-System" }
+    {
+      "id": "anwendung",
+      "name": "Anwendung"
+    },
+    {
+      "id": "mobil",
+      "name": "Baustelle"
+    },
+    {
+      "id": "system",
+      "name": "Design-System"
+    }
   ],
   "artboards": [
-    { "file": "Dashboard.dc.html",           "title": "Übersicht",             "page": "anwendung", "x": 0,    "y": 0,    "w": 1440, "h": 900 },
-    { "file": "Disposition.dc.html",         "title": "Plantafel",             "page": "anwendung", "x": 1560, "y": 0,    "w": 1440, "h": 900 },
-    { "file": "Material.dc.html",            "title": "Artikelstamm",          "page": "anwendung", "x": 3120, "y": 0,    "w": 1440, "h": 900 },
-    { "file": "Main.dc.html",                "title": "Angebot · Nacht",       "page": "anwendung", "x": 0,    "y": 1040, "w": 1440, "h": 900 },
-    { "file": "AngebotTag.dc.html",          "title": "Angebot · Tag",         "page": "anwendung", "x": 1560, "y": 1040, "w": 1440, "h": 900 },
-
-    { "file": "BaustellendokuMobil.dc.html", "title": "Baustellendoku",        "page": "mobil",     "x": 0,    "y": 0,    "w": 390,  "h": 844 },
-    { "file": "Zeiterfassung.dc.html",       "title": "Zeiterfassung",         "page": "mobil",     "x": 510,  "y": 0,    "w": 390,  "h": 844 },
-
-    { "file": "ThemeTokens.dc.html",         "title": "Farbrollen Tag / Nacht","page": "system",    "x": 0,    "y": 0,    "w": 1000, "h": 830 },
-    { "file": "Komponenten.dc.html",         "title": "Bausteine",             "page": "system",    "x": 1120, "y": 0,    "w": 1020, "h": 1180 }
+    {
+      "file": "Dashboard.dc.html",
+      "title": "Übersicht",
+      "page": "anwendung",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Disposition.dc.html",
+      "title": "Plantafel",
+      "page": "anwendung",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Material.dc.html",
+      "title": "Artikelstamm",
+      "page": "anwendung",
+      "x": 3120,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Main.dc.html",
+      "title": "Angebot · Nacht",
+      "page": "anwendung",
+      "x": 0,
+      "y": 1040,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "AngebotTag.dc.html",
+      "title": "Angebot · Tag",
+      "page": "anwendung",
+      "x": 1560,
+      "y": 1040,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "BaustellendokuMobil.dc.html",
+      "title": "Baustellendoku",
+      "page": "mobil",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Zeiterfassung.dc.html",
+      "title": "Zeiterfassung",
+      "page": "mobil",
+      "x": 510,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ThemeTokens.dc.html",
+      "title": "Farbrollen Tag / Nacht",
+      "page": "system",
+      "x": 0,
+      "y": 0,
+      "w": 1000,
+      "h": 830
+    },
+    {
+      "file": "Komponenten.dc.html",
+      "title": "Bausteine",
+      "page": "system",
+      "x": 1120,
+      "y": 0,
+      "w": 1020,
+      "h": 1500
+    }
   ],
   "annotations": [
     {
@@ -51,5 +130,8 @@
       "text": "DESIGN-SYSTEM\n\nLinks die 13 Farbrollen, die zwischen Tag und Nacht wechseln, mit nachgerechneten Kontrastwerten. Rechts Typografie, Flächengrößen und die Komponenten in beiden Modi nebeneinander.\n\nNächster Schritt hier: diese Rollen als CSS Custom Properties ausschreiben, dann ist der Umschalter Code statt zweier Entwürfe."
     }
   ],
-  "launch": { "view": "canvas", "page": "anwendung" }
+  "launch": {
+    "view": "canvas",
+    "page": "anwendung"
+  }
 }
