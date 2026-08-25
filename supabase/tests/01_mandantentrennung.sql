@@ -7,7 +7,8 @@
 -- Als Eigentümerrolle, also an RLS vorbei: zwei Betriebe mit je einem Benutzer.
 reset role;
 truncate betrieb, benutzer cascade;
-truncate journal;
+-- Das Journal wird NICHT geleert: es ist anfuegend (0011). Aussagen darueber
+-- grenzen sich stattdessen auf den Mandanten dieses Tests ein.
 
 insert into benutzer (id, email, anzeigename) values
   ('11111111-1111-1111-1111-111111111111', 'anna@bergmann-elektro.de',  'Anna Bergmann'),

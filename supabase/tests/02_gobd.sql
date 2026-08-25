@@ -5,7 +5,8 @@
 
 reset role;
 truncate betrieb, benutzer cascade;
-truncate journal;
+-- Das Journal wird NICHT geleert: es ist anfuegend (0011). Aussagen darueber
+-- grenzen sich stattdessen auf den Mandanten dieses Tests ein.
 
 insert into benutzer (id, email, anzeigename) values
   ('11111111-1111-1111-1111-111111111111', 'anna@bergmann-elektro.de', 'Anna Bergmann');
@@ -59,7 +60,9 @@ begin
   begin
     perform beleg_festschreiben(v_beleg);
     raise exception 'FAIL Pflichtangabe: Rechnung ohne Leistungsdatum wurde festgeschrieben';
-  exception when raise_exception then
+  -- Seit 0009 tragen die Abbrueche einen eigenen Fehlercode (restrict_violation),
+  -- damit die Anwendung Pflichtverletzungen von echten Fehlern unterscheiden kann.
+  exception when raise_exception or restrict_violation then
     if sqlerrm like 'FAIL%' then raise; end if;
   end;
   delete from beleg_position where beleg_id = v_beleg;
@@ -85,7 +88,9 @@ begin
   begin
     perform beleg_festschreiben(v_beleg);
     raise exception 'FAIL Doppelt: Beleg liess sich zweimal festschreiben';
-  exception when raise_exception then
+  -- Seit 0009 tragen die Abbrueche einen eigenen Fehlercode (restrict_violation),
+  -- damit die Anwendung Pflichtverletzungen von echten Fehlern unterscheiden kann.
+  exception when raise_exception or restrict_violation then
     if sqlerrm like 'FAIL%' then raise; end if;
   end;
 end $$;
@@ -187,7 +192,9 @@ begin
     update nummernkreis set naechste = 1
      where betrieb_id = 'aaaaaaaa-0000-0000-0000-000000000001';
     raise exception 'FAIL Nummernkreis liess sich zuruecksetzen';
-  exception when restrict_violation then null;
+  -- Zwei Schichten duerfen abwehren: seit 0009 fehlt der Anwendungsrolle das
+  -- Schreibrecht (insufficient_privilege), davor griff der Rueckwaerts-Trigger.
+  exception when restrict_violation or insufficient_privilege then null;
   end;
 end $$;
 
@@ -195,7 +202,9 @@ end $$;
 do $$
 declare n integer;
 begin
-  select count(*) into n from journal where tabelle = 'beleg' and aktion = 'insert';
+  select count(*) into n from journal
+   where tabelle = 'beleg' and aktion = 'insert'
+     and betrieb_id = 'aaaaaaaa-0000-0000-0000-000000000001';
   if n < 5 then raise exception 'FAIL Journal: nur % Beleg-Eintraege', n; end if;
 
   select count(*) into n from journal where benutzer_id = '11111111-1111-1111-1111-111111111111';

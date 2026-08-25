@@ -113,3 +113,21 @@ DATEV-Prüfprogramm 2.2.3.0, Mustangproject 2.25.0) altern schnell.
 
 **Vor jeder Architekturentscheidung, die auf einer Zahl aus diesem Plan
 beruht: Zahl neu prüfen.**
+
+---
+
+## Nachtrag 25.08.2026 — Recherchelauf zum Rechnungsmodell abgebrochen
+
+Der Versuch, Punkt 1 dieser Liste (Abschlagsrechnungen, Einbehalte, § 13b
+Reverse Charge) gegen Primaerquellen zu klaeren, ist **unvollstaendig
+abgebrochen**: von 151 Pruefagenten liefen nur 37 durch, 114 scheiterten am
+Nutzungslimit der Sitzung.
+
+Die Folge ist wichtig fuer die Bewertung: Der Lauf listet 38 Aussagen als
+"verworfen", aber die meisten davon tragen das Votum **0:0** — es wurde also
+gar keine gueltige Stimme abgegeben. Das ist ein Infrastrukturfehler, **kein
+inhaltliches Ergebnis**. Diese Aussagen sind damit weder belegt noch widerlegt.
+
+**Punkt 1 bleibt unveraendert offen.** Nichts aus jenem Lauf darf ohne erneute
+Pruefung ins Datenmodell einfliessen. Das betrifft insbesondere die dort
+genannten Fristen, Prozentsaetze und XRechnung-Feldzuordnungen.
