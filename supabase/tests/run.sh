@@ -32,6 +32,11 @@ for m in supabase/migrations/*.sql; do
 done
 echo "Migrationen eingespielt: $(ls supabase/migrations/*.sql | wc -l)"
 
+# Stellt her, was Supabase per default privileges ohnehin vergibt: anon und
+# authenticated haben Tabellenrechte in public. Ohne das testet der anon-Block
+# die Rechte statt der Policies.
+psql -d "$DB" -v ON_ERROR_STOP=1 -q -f supabase/local/01_anon_wie_supabase.sql
+
 fehler=0
 for t in supabase/tests/*.sql; do
   if ausgabe=$(psql -d "$DB" -v ON_ERROR_STOP=1 -q -f "$t" 2>&1); then
