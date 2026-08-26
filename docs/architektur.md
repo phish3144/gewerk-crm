@@ -26,7 +26,7 @@ Kostenschwellen sind mit 💰 markiert.
 | Baustein | Wahl | Begründung |
 |---|---|---|
 | Frontend | Next.js App Router als **PWA** | Ein Codebase für Büro-Desktop und Baustellen-Handy |
-| Hosting | **Cloudflare Workers + Pages** | Vercel Hobby ist für kommerzielle Nutzung **rechtlich ausgeschlossen**; Workers-Free-Tier großzügig; Account bereits verbunden |
+| Hosting | **Cloudflare Workers** (mit Workers Static Assets) | Vercel Hobby ist für kommerzielle Nutzung **rechtlich ausgeschlossen**; Workers-Free-Tier großzügig; Account bereits verbunden |
 | Datenbank | **Supabase Postgres**, `eu-central-1` | D1 scheitert an 100.000 Schreibzeilen/Tag; Postgres + RLS ist der belegte Multi-Tenancy-Pfad; Frankfurt = DSGVO |
 | Auth | Supabase Auth | RLS-Integration über `auth.uid()` |
 | Dateien | **Cloudflare R2** | **0 Egress** — Supabase-Egress kostet $0,09/GB, ~4× Storage-Preis |
@@ -53,6 +53,23 @@ Index kostet das Kontingent überproportional, und DDL zählt auf beide Kontinge
 
 Baustellenfotos werden häufig wiederholt mobil abgerufen — Egress ist der
 Kostentreiber, nicht Storage. Bei R2 ist er strukturell null.
+
+### Ein Worker, nicht Pages
+
+OpenNext uebersetzt die Ausgabe von `next build` in **einen Cloudflare Worker**
+plus einem Verzeichnis statischer Dateien, die ueber die `ASSETS`-Bindung
+ausgeliefert werden. Cloudflare Pages kommt dabei nicht vor — fuer neue Projekte
+empfiehlt Cloudflare inzwischen ausdruecklich Workers statt Pages.
+
+Es entsteht also genau **ein** Worker namens `gewerk-crm`, der sowohl die
+Serverteile der Anwendung ausfuehrt als auch die statischen Dateien bedient. Die
+R2-Bindung haengt an diesem Worker.
+
+> **Zur Kenntnis, nicht zur sofortigen Umsetzung:** Cloudflare nennt seit
+> August 2026 `vinext` den empfohlenen Weg fuer neue Next.js-Anwendungen und
+> OpenNext den Pfad fuer bestehende. vinext ist Beta. Wir bleiben bei OpenNext,
+> weil es traegt und gebaut ist; ein Wechsel ist spaeter moeglich und sollte
+> gegen die Vertraeglichkeitsliste geprueft werden, nicht auf Verdacht erfolgen.
 
 ### EU-Jurisdiktion: einmalig und unumkehrbar
 

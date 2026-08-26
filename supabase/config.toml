@@ -1,0 +1,9 @@
+# Bewusst minimal. Beim Deploy auf die Produktion wendet die GitHub-Integration
+# ausschliesslich Migrationen an sowie Edge Functions und Storage-Buckets, die
+# hier ausdruecklich stehen. Alles Weitere — API, Auth, Seed-Dateien — wird
+# ignoriert.
+#
+# Wir deklarieren nichts davon: die Auth-Einstellungen werden im Dashboard
+# gepflegt, und der Dateispeicher liegt in Cloudflare R2, nicht in Supabase
+# Storage (siehe docs/architektur.md).
+project_id = "jiehbsdgaefqlticgwyf"
