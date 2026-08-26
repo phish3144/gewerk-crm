@@ -29,6 +29,12 @@ export default async function ProjektBearbeiten({
         <h1 className="seitentitel">{projekt.bezeichnung}</h1>
       </div>
 
+      <div className="reihe">
+        <Link className="taste taste-sekundaer" href={`/projekte/${id}/doku`}>
+          Baustellendoku
+        </Link>
+      </div>
+
       {gespeichert && (
         <p className="hinweis hinweis-freundlich" role="status">
           Gespeichert.

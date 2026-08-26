@@ -20,6 +20,11 @@ export type Eintrag = {
   nutzlast: Record<string, unknown>;
   erstellt: number;
   versuche: number;
+  // Nur bei Fotos: die Datei selbst wartet mit. IndexedDB speichert Blobs
+  // unveraendert, deshalb ueberlebt das Bild auch Appneustart und leeren Akku.
+  // Beim Senden geht zuerst die Datei in den Dateispeicher, dann die Zeile.
+  datei?: Blob;
+  dateiname?: string;
 };
 
 function oeffnen(): Promise<IDBDatabase> {
@@ -52,20 +57,33 @@ async function mitLaden<T>(
 export async function anstellen(
   art: Eintrag["art"],
   nutzlast: Record<string, unknown>,
+  datei?: { blob: Blob; name: string },
 ): Promise<string> {
   const id = (nutzlast["id"] as string) ?? crypto.randomUUID();
   try {
     await mitLaden("readwrite", (l) =>
-      l.put({ id, art, nutzlast: { ...nutzlast, id }, erstellt: Date.now(), versuche: 0 }),
+      l.put({
+        id,
+        art,
+        nutzlast: { ...nutzlast, id },
+        erstellt: Date.now(),
+        versuche: 0,
+        ...(datei ? { datei: datei.blob, dateiname: datei.name } : {}),
+      }),
     );
   } catch (fehler) {
     // In einem privaten Fenster oder bei gesperrtem Speicher gibt es keine
     // IndexedDB. Dann darf die Erfassung nicht still verschwinden — sie geht
     // direkt raus, und scheitert das auch, erfaehrt es die Aufruferin.
+    let nutzlast2: Record<string, unknown> = { ...nutzlast, id };
+    if (datei) {
+      const schluessel = await dateiAblegen(nutzlast2, datei.blob, datei.name);
+      nutzlast2 = { ...nutzlast2, r2_key: schluessel };
+    }
     const antwort = await fetch("/api/warteschlange", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ art, nutzlast: { ...nutzlast, id } }),
+      body: JSON.stringify({ art, nutzlast: nutzlast2 }),
     });
     if (!antwort.ok) {
       throw new Error(
@@ -75,6 +93,28 @@ export async function anstellen(
     }
   }
   return id;
+}
+
+// Legt die Datei im Dateispeicher ab und liefert den Objektschluessel. Getrennt
+// vom Zeilenversand, weil beide Schritte einzeln scheitern koennen.
+async function dateiAblegen(
+  nutzlast: Record<string, unknown>,
+  blob: Blob,
+  name: string,
+): Promise<string> {
+  const formular = new FormData();
+  formular.set("projekt_id", String(nutzlast["projekt_id"] ?? ""));
+  formular.set("datei", new File([blob], name, { type: blob.type || "image/jpeg" }));
+
+  const antwort = await fetch("/api/dokument", { method: "POST", body: formular });
+  const ergebnis = (await antwort.json().catch(() => ({}))) as {
+    r2_key?: string;
+    fehler?: string;
+  };
+  if (!antwort.ok || !ergebnis.r2_key) {
+    throw new Error(ergebnis.fehler ?? "Das Foto konnte nicht abgelegt werden.");
+  }
+  return ergebnis.r2_key;
 }
 
 export async function offen(): Promise<Eintrag[]> {
@@ -98,20 +138,43 @@ export async function absenden(): Promise<{ gesendet: number; verblieben: number
   let gesendet = 0;
 
   for (const eintrag of liste) {
+    // Der Stand, der bei einem Fehlschlag zurueckgeschrieben wird. Nach einem
+    // geglueckten Dateiversand ist das nicht mehr der Ausgangseintrag.
+    let stand = eintrag;
     try {
+      // Erst die Datei, dann die Zeile. Der Schluessel wird sofort in die
+      // Warteschlange zurueckgeschrieben und die Datei dabei entfernt: geht der
+      // zweite Schritt schief, legt der naechste Versuch kein zweites Objekt
+      // im Speicher ab.
+      if (eintrag.datei) {
+        const schluessel = await dateiAblegen(
+          eintrag.nutzlast,
+          eintrag.datei,
+          eintrag.dateiname ?? "foto.jpg",
+        );
+        stand = {
+          id: eintrag.id,
+          art: eintrag.art,
+          nutzlast: { ...eintrag.nutzlast, r2_key: schluessel },
+          erstellt: eintrag.erstellt,
+          versuche: eintrag.versuche,
+        };
+        await mitLaden("readwrite", (l) => l.put(stand));
+      }
+
       const antwort = await fetch("/api/warteschlange", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ art: eintrag.art, nutzlast: eintrag.nutzlast }),
+        body: JSON.stringify({ art: stand.art, nutzlast: stand.nutzlast }),
       });
       if (!antwort.ok) {
-        await versuchZaehlen(eintrag);
+        await versuchZaehlen(stand);
         break;
       }
       await abhaken(eintrag.id);
       gesendet += 1;
     } catch {
-      await versuchZaehlen(eintrag);
+      await versuchZaehlen(stand);
       break;
     }
   }

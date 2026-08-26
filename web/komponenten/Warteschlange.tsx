@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { absenden, offen } from "@/lib/warteschlange";
 
@@ -7,6 +8,7 @@ import { absenden, offen } from "@/lib/warteschlange";
 // der haeufigste Vertrauensbruch mobiler Baustellen-Apps: die Monteurin erfasst
 // zwanzig Stunden, sieht keinen Hinweis, und im Buero fehlt alles.
 export function Warteschlange({ beiAenderung }: { beiAenderung?: (anzahl: number) => void }) {
+  const router = useRouter();
   const [wartend, setzeWartend] = useState(0);
   const [laeuft, setzeLaeuft] = useState(false);
   const [online, setzeOnline] = useState(true);
@@ -21,12 +23,16 @@ export function Warteschlange({ beiAenderung }: { beiAenderung?: (anzahl: number
     if (laeuft) return;
     setzeLaeuft(true);
     try {
-      await absenden();
+      const { gesendet } = await absenden();
+      // Angekommenes gehoert auf den Bildschirm. Ohne dieses Neuladen bleibt
+      // die Liste leer, bis die Nutzerin von sich aus neu laedt — und die
+      // gerade erfasste Stunde sieht aus wie verloren.
+      if (gesendet > 0 && navigator.onLine) router.refresh();
     } finally {
       setzeLaeuft(false);
       await pruefen();
     }
-  }, [laeuft, pruefen]);
+  }, [laeuft, pruefen, router]);
 
   useEffect(() => {
     setzeOnline(navigator.onLine);

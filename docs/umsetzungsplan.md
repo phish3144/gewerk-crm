@@ -231,7 +231,7 @@ Netzrückkehr), er verschwand bis zur Übertragung aus der Ansicht, und
 
 ---
 
-### Schritt 5 — Fotos, Notizen, R2
+### Schritt 5 — Fotos, Notizen, R2 ✓ erledigt
 
 **Ziel:** Der Nachweiskanal. Ohne ihn kann Schritt 6 keinen Nachweis verlangen.
 
@@ -245,6 +245,22 @@ Netzrückkehr), er verschwand bis zur Übertragung aus der Ansicht, und
 - Foto offline aufnehmen, später hochladen, im Projekt sichtbar
 - Kein öffentlich lesbarer Bucket; eine URL ohne Signatur liefert 403
 - `erfasst_am` kommt vom Gerät, `hochgeladen_am` vom Server — beide sichtbar, wenn sie auseinanderliegen
+
+**Belegt durch**
+- `web/e2e/05_doku.spec.ts`, vier Prüfungen. Drei davon laufen nur gegen die
+  Worker-Fassung (`playwright.worker.ts`): die R2-Bindung gibt es allein in der
+  workerd-Laufzeit, unter `next start` fehlt sie. Im lokalen Lauf werden sie
+  ausdrücklich übersprungen, statt eine Umgebungslücke als Anwendungsfehler
+  auszugeben.
+- Foto ohne Netz: das Bild wartet als Blob in IndexedDB mit. Beim Senden geht
+  erst die Datei in den Speicher, dann die Zeile — und der Schlüssel wird
+  sofort in die Warteschlange zurückgeschrieben, damit ein zweiter Versuch kein
+  zweites Objekt ablegt.
+- Der Bucket ist nicht öffentlich. Ausgeliefert wird nur über
+  `/api/dokument?k=…`; ein Schlüssel aus einem fremden Betrieb wird abgewiesen,
+  **bevor** der Bucket gefragt wird (erstes Segment ist die `betrieb_id`).
+- `hochgeladen_am` steht neben `erfasst_am`, sobald die beiden auf
+  verschiedene Tage fallen.
 
 > **Vorbereitung:** R2 ist freigeschaltet (26.08.2026) — die Bucket-Liste
 > antwortet, kein Fehler 10042 mehr. Der Bucket selbst wird im Dashboard **mit
