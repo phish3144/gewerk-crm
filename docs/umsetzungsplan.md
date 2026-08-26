@@ -169,7 +169,7 @@ angelegte Datensätze räumen die Tests über die Anwendungsrolle wieder ab.
 
 ---
 
-### Schritt 3 — Angebot und Auftrag mit Positionen
+### Schritt 3 — Angebot und Auftrag mit Positionen ✓ erledigt
 
 **Ziel:** Das Leistungsverzeichnis entsteht. **Ohne diesen Schritt gibt es
 nichts, wogegen der Wächter prüfen könnte.**
@@ -189,6 +189,13 @@ nichts, wogegen der Wächter prüfen könnte.**
 **Fallstrick:** Die Summen dürfen **nicht** im Client gerechnet und gespeichert
 werden. Die Datenbank rechnet, der Client zeigt. Weicht der Client ab, ist der
 Client falsch.
+
+**Abgenommen am 27.08.2026:** 16 Oberflächentests grün. Belegt sind: Summen aus
+`beleg.netto/steuer/brutto` gegen eine Handrechnung (820,00 / 155,80 / 975,80),
+Festschreiben vergibt `AN-2026-00001` und sperrt die Oberfläche, eine bloße
+Titelzeile wird als „keine abrechenbare Position" abgewiesen, und aus dem
+Angebot entsteht ein Auftrag mit eigenem Präfix `AU-` und übernommenen
+Positionen.
 
 ---
 

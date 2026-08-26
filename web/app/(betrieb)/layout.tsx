@@ -16,11 +16,13 @@ const bereiche = {
     { pfad: "/uebersicht", text: "Übersicht" },
     { pfad: "/kunden", text: "Kunden" },
     { pfad: "/projekte", text: "Projekte" },
+    { pfad: "/belege", text: "Belege" },
   ],
   inhaber: [
     { pfad: "/uebersicht", text: "Übersicht" },
     { pfad: "/kunden", text: "Kunden" },
     { pfad: "/projekte", text: "Projekte" },
+    { pfad: "/belege", text: "Belege" },
   ],
 } as const;
 

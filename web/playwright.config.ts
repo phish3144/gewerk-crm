@@ -11,6 +11,14 @@ export default defineConfig({
   testDir: "./e2e",
   timeout: 30_000,
   fullyParallel: false,
+  // Ein Arbeiter, nicht zwei. Alle angemeldeten Tests benutzen dasselbe
+  // Pruefkonto, und Supabase tauscht bei jeder Tokenerneuerung das
+  // Refresh-Token aus: erneuert der zweite Browser, wird die Sitzung des ersten
+  // ungueltig und er landet mitten im Test auf der Anmeldemaske. Das ist eine
+  // Eigenheit des gemeinsamen Kontos, kein Fehler der Anwendung — zwei echte
+  // Nutzer haetten getrennte Sitzungen. Der Lauf dauert dadurch etwa doppelt so
+  // lange und ist dafuer wiederholbar.
+  workers: 1,
   reporter: [["list"]],
   use: {
     baseURL: "http://127.0.0.1:3100",
