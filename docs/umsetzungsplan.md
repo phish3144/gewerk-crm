@@ -199,7 +199,7 @@ Positionen.
 
 ---
 
-### Schritt 4 — Zeiterfassung mit Positionsbezug
+### Schritt 4 — Zeiterfassung mit Positionsbezug ✓ erledigt
 
 **Ziel:** Der Erfassungspunkt, an dem der Wächter später ansetzt.
 
@@ -218,6 +218,16 @@ Positionen.
 **Fallstrick:** Wird „keine passende Position" umständlicher gestaltet als die
 Positionsauswahl, wählen die Monteure irgendeine Position — und der Wächter
 verhungert. Der Knopf muss **genauso leicht** erreichbar sein.
+
+**Abgenommen am 27.08.2026:** 19 Oberflächentests grün. Ein Test misst die
+Knopfgrößen und schlägt fehl, sobald „Keine passende Position" schmaler oder
+niedriger wird als eine Position. Der Offline-Test erfasst im Flugmodus,
+schaltet das Netz zu und zählt in der Datenbank nach: genau ein Datensatz.
+
+Drei echte Mängel kamen dabei ans Licht, alle drei erst beim Ausprobieren:
+ein erfasster Eintrag wurde nie von selbst gesendet (nur bei Appstart oder
+Netzrückkehr), er verschwand bis zur Übertragung aus der Ansicht, und
+`router.refresh()` warf die Seite im Funkloch auf die Fehlerseite des Browsers.
 
 ---
 
