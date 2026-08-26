@@ -120,7 +120,12 @@ declare
   erlaubt text[] := array[
     'beleg_festschreiben',
     'beleg_summen_neu',
+    'betrieb_gruenden',
     'betrieb_loeschen',
+    'konto_anlegen',
+    'mitglied_aufnehmen',
+    'mitglied_entfernen',
+    'mitglied_rolle_setzen',
     'loeschung_laeuft_fuer',   -- aus Invoker-Triggern heraus aufgerufen, siehe 0017
     'meine_betriebe',
     'meine_betriebe_inhaber',

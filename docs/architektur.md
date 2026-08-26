@@ -77,7 +77,7 @@ dauerhaft ohne EU-Bindung. Zwei Wege, die es können:
 ```bash
 # Dashboard: R2 → Create bucket → Location → "Specify jurisdiction" → EU
 # oder:
-wrangler r2 bucket create gewerk-crm-dokumente -J eu --location weur
+wrangler r2 bucket create gewerk-crm-storage -J eu --location weur
 ```
 
 **Folgen für den Anwendungscode** — beides ist beim ersten Zugriff sonst ein
@@ -87,17 +87,27 @@ Rätsel:
   ```toml
   [[r2_buckets]]
   binding = "DOKUMENTE"
-  bucket_name = "gewerk-crm-dokumente"
+  bucket_name = "gewerk-crm-storage"
   jurisdiction = "eu"
   ```
 - Über die S3-API gilt ein eigener Endpunkt:
   `https://<account_id>.eu.r2.cloudflarestorage.com`. Ein Aufruf gegen den
   normalen Endpunkt findet den Bucket nicht.
 - Auch beim Auflisten und in den Metriken taucht er nur mit Jurisdiktionsangabe
-  auf (in der Metrik als `eu_gewerk-crm-dokumente`). Ein leeres Ergebnis ohne
+  auf (in der Metrik als `eu_gewerk-crm-storage`). Ein leeres Ergebnis ohne
   Jurisdiktionsangabe heißt also nicht, dass der Bucket fehlt.
 - Logpush arbeitet nicht mit Buckets, die einer Jurisdiktion zugeordnet sind.
   Für uns ohne Belang, aber gut zu wissen, bevor jemand es versucht.
+
+**Angelegt am 26.08.2026:** `gewerk-crm-storage`, Jurisdiktion EU.
+
+Der MCP-Connector sieht ihn nicht — `r2_buckets_list` liefert eine leere Liste
+und `r2_bucket_get` einen 404 mit „The specified bucket does not exist". Das ist
+kein Fehler, sondern die Folge der fehlenden Jurisdiktionsangabe in diesen
+Aufrufen. **Ein 404 von dort ist also kein Beleg dafür, dass der Bucket fehlt** —
+und umgekehrt kann der Connector seine Existenz auch nicht bestätigen.
+Verlässlich prüfbar ist er über das Dashboard, über `wrangler r2 bucket list -J eu`
+oder ab Schritt 5 dadurch, dass die Worker-Bindung ihn auflöst.
 
 ---
 

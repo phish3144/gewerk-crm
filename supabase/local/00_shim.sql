@@ -3,9 +3,32 @@
 -- Diese Datei wird NIE auf ein Supabase-Projekt angewendet.
 create schema if not exists auth;
 
+-- Wie in Supabase: erst der einzelne Claim, dann das vollstaendige Token.
+-- Beide Wege muessen tragen, weil die aelteren Testdateien request.jwt.claim.sub
+-- setzen und die neueren das ganze request.jwt.claims.
 create or replace function auth.uid() returns uuid
   language sql stable
-  as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+  as $$
+    select coalesce(
+      nullif(current_setting('request.jwt.claim.sub', true), ''),
+      nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'
+    )::uuid
+  $$;
+
+-- konto_anlegen liest die E-Mail aus dem Token, nicht aus einem Parameter.
+-- Supabase stellt dafuer auth.jwt() bereit; lokal wird derselbe GUC gelesen,
+-- den auch auth.uid() benutzt.
+create or replace function auth.jwt() returns jsonb
+  language sql stable
+  as $fn$
+    select coalesce(
+      nullif(current_setting('request.jwt.claims', true), '')::jsonb,
+      jsonb_build_object(
+        'sub',   nullif(current_setting('request.jwt.claim.sub',   true), ''),
+        'email', nullif(current_setting('request.jwt.claim.email', true), '')
+      )
+    )
+  $fn$;
 
 do $$
 begin

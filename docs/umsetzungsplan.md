@@ -45,7 +45,7 @@ Baustelle **tatsächlich verbraucht** wird, erfasst bisher nichts. „Material o
 Position" lässt sich also gar nicht feststellen — die Tabelle dafür existiert
 nicht.
 
-→ **Migration 0019:** neue Tabelle `materialentnahme`, gebaut wie `zeiteintrag`:
+→ **Migration 0020:** neue Tabelle `materialentnahme`, gebaut wie `zeiteintrag`:
 client-erzeugte `id` (idempotenter Offline-Upload), `projekt_id`,
 `artikel_id` (nullable, freie Eingabe erlaubt), `bezeichnung`, `menge`,
 `einheit`, **`position_id` nullable** — genau das Signal, das den Wächter
@@ -58,16 +58,35 @@ Storno. Ein Nachtrag ist fachlich ein Angebot mit Bezug auf einen bestehenden
 Auftrag und gehört als eigene Art hinein — sonst ist er in der Auswertung nicht
 von einem normalen Angebot zu trennen.
 
-→ **Migration 0019:** `nachtrag` in `beleg_art`, Präfix `NA-` in
+→ **Migration 0020:** `nachtrag` in `beleg_art`, Präfix `NA-` in
 `nummer_praefix()`. Der Bezug zum Hauptauftrag läuft über das vorhandene
 `vorgaenger_id`.
 
-### 3. Die Bedenkenanzeige hat keinen Ort
+### 3. Es gab keinen Weg, ein Konto anzulegen — behoben in 0019
+
+Beim Bau der Anmeldemaske aufgefallen und sofort geschlossen: `betrieb` hatte
+seit 0013 **keine INSERT-Policy mehr**. 0013 ersetzte `betrieb_eigene` (`for
+all`) durch `betrieb_lesen` (select) und `betrieb_aendern` (update) — INSERT
+fiel dabei ersatzlos weg. Dazu sind `benutzer` und `benutzer_betrieb` für die
+Anwendungsrolle nur lesbar; 0006 vermerkt „Einladungen laufen über eine
+gesonderte Funktion", die es nie gab.
+
+Ergebnis: Niemand konnte sich registrieren, keinen Betrieb gründen, keine
+Kollegin aufnehmen. Die gesamte Anwendung hätte auf einem Schema aufgesetzt, das
+keinen ersten Benutzer zulässt.
+
+→ **Migration 0019** mit fünf security-definer-Funktionen: `konto_anlegen`,
+`betrieb_gruenden`, `mitglied_aufnehmen`, `mitglied_rolle_setzen`,
+`mitglied_entfernen`. Test 10 prüft den Weg und die Abwege — unter anderem, dass
+niemand sich selbst in einen fremden Betrieb aufnehmen kann und dass der letzte
+Inhaber weder zurücktreten noch entfernt werden kann.
+
+### 4. Die Bedenkenanzeige hat keinen Ort
 
 § 4 Abs. 3 VOB/B verlangt **unverzüglich und schriftlich**. Ein Beweis, der als
 Notiz in einem Textfeld liegt, ist keiner.
 
-→ **Migration 0020:** Tabelle `bedenkenanzeige` mit `erstellt_am`,
+→ **Migration 0021:** Tabelle `bedenkenanzeige` mit `erstellt_am`,
 `versendet_am`, `versandart`, `empfaenger`, Bezug auf Projekt und auslösende
 Buchung — und einem Trigger, der sie **ab dem Versand unveränderlich** macht,
 nach demselben Muster wie `beleg_unveraenderlich()`.
@@ -212,7 +231,7 @@ das nicht beauftragt ist.
 
 **Inhalt**
 
-*Migrationen 0019 und 0020* wie oben beschrieben.
+*Migrationen 0020 und 0021* wie oben beschrieben.
 
 *Drei Regeln:*
 
@@ -342,8 +361,9 @@ genau das, was sonst niemand tut.
 
 1. ~~R2 freischalten~~ — erledigt am 26.08.2026. Offen ist nur noch der Bucket
    selbst, anzulegen mit **Jurisdiktion EU**.
-2. **Verrechnungssatz je Mitarbeiter** fehlt im Modell. Für den Eurobetrag in
-   Schritt 6 nötig. Kleine Ergänzung an `mitarbeiter`, kommt in 0019 mit.
+2. ~~Verrechnungssatz je Mitarbeiter fehlt~~ — **falsch notiert.**
+   `mitarbeiter.stundensatz numeric(14,2)` existiert seit 0002. Für den
+   Eurobetrag in Schritt 6 ist nichts zu ergänzen.
 3. **Kein Artboard für „Ungeklärt"** — die wichtigste Ansicht der App hat noch
    kein Bild. Sollte vor Schritt 6 entworfen werden.
 4. **Steuerberater** vor den ersten echten Rechnungen; Fragenliste liegt in
