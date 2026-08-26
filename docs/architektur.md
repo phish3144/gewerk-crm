@@ -54,6 +54,28 @@ Index kostet das Kontingent überproportional, und DDL zählt auf beide Kontinge
 Baustellenfotos werden häufig wiederholt mobil abgerufen — Egress ist der
 Kostentreiber, nicht Storage. Bei R2 ist er strukturell null.
 
+### Stand des Ausrollens
+
+| | |
+|---|---|
+| Worker | `gewerk-crm` |
+| Adresse | https://gewerk-crm.f3x.workers.dev |
+| Konto | `d217dfbf7039817de7c3ad5e2deee9ab` |
+| Bindungen | `DOKUMENTE` (R2, `gewerk-crm-storage`, `eu`), `ASSETS` |
+
+Ausgerollt wird von Hand aus `web/`:
+
+```bash
+export CLOUDFLARE_API_TOKEN=<token>
+npm run cf:build && npx wrangler deploy
+```
+
+**Migrationen laufen nicht ueber git.** Die Supabase-GitHub-Integration ist
+verbunden, „Deploy to production" ist aber ausgeschaltet — Migrationen werden
+weiterhin ueber den Supabase-Connector angewendet. Die Dateinamen tragen
+trotzdem das Zeitstempelformat, damit ein spaeteres Einschalten der Automatik
+sofort greift und nichts doppelt laeuft.
+
 ### Ein Worker, nicht Pages
 
 OpenNext uebersetzt die Ausgabe von `next build` in **einen Cloudflare Worker**
@@ -116,7 +138,16 @@ Rätsel:
 - Logpush arbeitet nicht mit Buckets, die einer Jurisdiktion zugeordnet sind.
   Für uns ohne Belang, aber gut zu wissen, bevor jemand es versucht.
 
-**Angelegt am 26.08.2026:** `gewerk-crm-storage`, Jurisdiktion EU.
+**Angelegt am 26.08.2026:** `gewerk-crm-storage`, Jurisdiktion EU — und am selben
+Tag belegt statt vermutet:
+
+```
+wrangler r2 bucket list          ->  (leer)
+wrangler r2 bucket list -J eu    ->  gewerk-crm-storage
+```
+
+Beim Deploy bestaetigt der Worker die Aufloesung selbst:
+`env.DOKUMENTE (gewerk-crm-storage (eu))`.
 
 Der MCP-Connector sieht ihn nicht — `r2_buckets_list` liefert eine leere Liste
 und `r2_bucket_get` einen 404 mit „The specified bucket does not exist". Das ist

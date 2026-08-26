@@ -109,7 +109,9 @@ Voraussetzung.
 
 ---
 
-### Schritt 1 — Gerüst und Anmeldung
+### Schritt 1 — Gerüst und Anmeldung ✓ erledigt
+
+Live: **https://gewerk-crm.f3x.workers.dev**
 
 **Ziel:** Eine angemeldete Person sieht ihren Betrieb und sonst nichts.
 
@@ -129,6 +131,15 @@ Voraussetzung.
 **Fallstrick:** Der `service_role`-Schlüssel darf nie in den Client. Die gesamte
 Mandantentrennung hängt daran, dass jeder Zugriff als `authenticated` läuft und
 damit durch RLS. Deshalb ist das ein Test, keine Konvention.
+
+**Am 26.08.2026 gegen die ausgerollte Fassung geprüft:** Umleitung ohne
+Anmeldung, Stylesheet und Schriften werden ausgeliefert, Tokens für Tag und
+Nacht sind enthalten, kein Dienstschlüssel im tatsächlich ausgelieferten
+JavaScript, und die Laufzeitprotokolle des Workers zeigen `ok` ohne Ausnahmen —
+der Worker erreicht Supabase.
+
+Offen blieb allein die erste echte Registrierung; sie legt das erste Konto im
+Projekt an und gehört deshalb dem Betreiber, nicht dem Prüflauf.
 
 ---
 

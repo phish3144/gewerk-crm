@@ -46,3 +46,26 @@ Kopie.
 In der Entwicklungsumgebung liegt Chromium bereits unter `/opt/pw-browsers`.
 `playwright.config.ts` verweist darauf, wenn die Datei existiert, und fällt sonst
 auf den Standardweg zurück. `npx playwright install` ist dort nicht nötig.
+
+## Ausrollen
+
+```bash
+export CLOUDFLARE_API_TOKEN=<token>   # Vorlage "Edit Cloudflare Workers"
+npm run cf:build
+npx wrangler deploy
+```
+
+Es entsteht **ein** Worker (`gewerk-crm`) mit der `ASSETS`-Bindung für die
+statischen Dateien und der R2-Bindung `DOKUMENTE`. Nach dem Deploy nennt wrangler
+die aufgelösten Bindungen — dort muss `gewerk-crm-storage (eu)` stehen, sonst
+zeigt die Bindung auf den falschen oder gar keinen Bucket.
+
+## Grenze der Oberflächentests in dieser Umgebung
+
+`npm run e2e` läuft gegen den lokalen Server. Gegen eine **öffentliche Adresse**
+laufen die Tests hier nicht: der Browser aus `/opt/pw-browsers` kommt nicht durch
+den Agent-Proxy und bricht mit `ERR_CONNECTION_RESET` ab, während `curl` durchgeht.
+Die ausgerollte Fassung wird deshalb mit `curl` und `wrangler tail` geprüft —
+ausgeliefertes HTML, Stylesheet, Schriften, Bundle-Inhalt und Laufzeitfehler.
+Auf einem Rechner ohne diesen Proxy funktionieren die Tests auch gegen die
+Live-Adresse.
