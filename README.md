@@ -50,11 +50,20 @@ Konfidenzstufen in den Dokumenten:
 | | Zustand |
 |---|---|
 | Design-Tokens (`app/tokens.css`) | 13 Rollen, Tag und Nacht, 21 Kontrastpaare nachgerechnet |
-| Schema (`supabase/migrations/`) | 6 Migrationen, gegen echten Postgres ausgeführt |
-| Mandantentrennung | 7 Durchgriffsversuche werden abgewehrt |
-| GoBD | Festschreibung, Unveränderbarkeit, lückenlose Nummern, Journal |
-| Supabase-Projekt | `gewerk-crm`, Region `eu-central-1`, Postgres 17 |
-| Schema auf Supabase | 7 Migrationen angewendet, Linter meldet nur noch einen beabsichtigten Hinweis |
+| Entwürfe (`design/`) | 9 Ansichten als Artboards |
+| Schema (`supabase/migrations/`) | 18 Migrationen, 20 Tabellen, gegen echten Postgres ausgeführt |
+| Tests (`supabase/tests/`) | 9 Dateien, alle grün |
+| Mandantentrennung | 7 Durchgriffsversuche und 12 Wege über die Mandantengrenze abgewehrt |
+| GoBD | Festschreibung, Unveränderbarkeit, lückenlose Nummern, anfügendes Journal |
+| Rechnungsmodell | Abschlag/Teil/Schluss, Absetzung nach § 14 Abs. 5 UStG, Einbehalt, Skonto, § 13b |
+| Rechtevergabe | `anon` entrechtet, kein TRUNCATE, Funktionsfreigabe ausgeschrieben |
+| Supabase-Projekt | `gewerk-crm`, Region `eu-central-1`, Postgres 17.6 |
+| Schema auf Supabase | 18 Migrationen angewendet, 5 beabsichtigte Linter-Hinweise |
+
+**Anwendungscode gibt es noch nicht.** Das Fundament trägt die Regeln, nicht die
+Bedienung: es gibt keine Oberfläche, keine Anmeldung, keinen PDF- oder
+E-Rechnungs-Export. Was dafür zu bauen ist, steht in
+[docs/roadmap.md](docs/roadmap.md).
 
 ```bash
 ./scripts/db-test.sh     # Datenbank neu bauen, Migrationen, Tests, Kontrastwerte
@@ -62,25 +71,32 @@ Konfidenzstufen in den Dokumenten:
 
 Der Testlauf braucht einen lokalen Postgres. `supabase/local/00_shim.sql` bildet
 nach, was Supabase mitbringt (auth-Schema, `auth.uid()`, die Rollen `anon`,
-`authenticated`, `service_role`) — diese Datei wird **nie** auf ein
-Supabase-Projekt angewendet.
+`authenticated`, `service_role` **und deren Standardrechte**) — diese Datei wird
+**nie** auf ein Supabase-Projekt angewendet.
+
+Die Standardrechte sind kein Detail: Supabase erteilt neuen Tabellen und
+Funktionen automatisch Rechte für `anon` und `authenticated`. Solange der lokale
+Cluster das nicht nachbildete, war er strenger als die Produktion — und eine
+Zusicherung, die seit `0009` grün war, war es nur deshalb. Siehe
+[docs/schema-befunde.md](docs/schema-befunde.md), Nachtrag.
 
 ### Sicherheitsprüfung
 
 Supabases eigener Datenbank-Linter läuft zusätzlich zu den Tests, weil er Dinge
 sieht, die lokal nicht auffallen — etwa welche Funktionen über die
-REST-Schnittstelle erreichbar sind. Er meldete fünf Punkte, `0007_haertung.sql`
-behebt vier davon:
+REST-Schnittstelle erreichbar sind. `0007_haertung.sql` und `0017_rechtevergabe.sql`
+haben seine Funde abgearbeitet, von 14 Sicherheitshinweisen auf 5.
 
-- `btree_gist` lag im Schema `public`, das die API ausliefert → nach `extensions` verschoben
-- `journal_schreiben()` war als `security definer` für `anon` und `authenticated`
-  über `/rest/v1/rpc/` aufrufbar → Ausführungsrecht vollständig entzogen
-- `meine_betriebe()` war für `anon` aufrufbar → entzogen
+Die verbleibenden 5 sind **beabsichtigt**: fünf `security definer`-Funktionen
+bleiben für `authenticated` aufrufbar, weil die Anwendung sie braucht. Jede
+prüft die Zugehörigkeit selbst gegen `auth.uid()` — `meine_betriebe*()` liefert
+nur die eigenen Betriebe des Aufrufers, `beleg_festschreiben()` und
+`betrieb_loeschen()` weisen fremde Mandanten ab.
 
-Der verbleibende Hinweis ist **beabsichtigt**: `meine_betriebe()` muss für
-`authenticated` ausführbar bleiben, weil jede RLS-Policy sie aufruft. Ein
-Direktaufruf liefert nur die eigenen Betriebe des Aufrufers zurück — also
-nichts, was er nicht ohnehin weiß.
+Der Linter ist dabei nicht die letzte Instanz. Zwei der drei Funde in `0017`
+standen in keiner Lint-Meldung, und bei der Indexdeckung meldete er 20 von 23
+Fällen — Teilindizes zählt er als Deckung, eine Fremdschlüsselprüfung kann sie
+aber nicht nutzen.
 
 ### Verbindungsdaten
 
