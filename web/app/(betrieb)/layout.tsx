@@ -10,12 +10,17 @@ import { BetriebWaehler } from "./BetriebWaehler";
 const bereiche = {
   monteur: [
     { pfad: "/uebersicht", text: "Übersicht" },
+    { pfad: "/projekte", text: "Projekte" },
   ],
   buero: [
     { pfad: "/uebersicht", text: "Übersicht" },
+    { pfad: "/kunden", text: "Kunden" },
+    { pfad: "/projekte", text: "Projekte" },
   ],
   inhaber: [
     { pfad: "/uebersicht", text: "Übersicht" },
+    { pfad: "/kunden", text: "Kunden" },
+    { pfad: "/projekte", text: "Projekte" },
   ],
 } as const;
 

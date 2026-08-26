@@ -1,5 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 import { existsSync } from "node:fs";
+import { config } from "dotenv";
+
+// Vor allem anderen: die Konfigurationsdatei wird als Erstes ausgewertet.
+config({ path: ".env.local", quiet: true });
 
 const VORHANDENER_BROWSER = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 
