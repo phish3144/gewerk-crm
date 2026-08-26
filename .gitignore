@@ -10,3 +10,6 @@ web/app/stile/*.css
 web/test-results/
 web/playwright-report/
 *.tsbuildinfo
+
+# Lokaler Laufzeitzustand von wrangler/miniflare — nie ins Repo.
+.wrangler/
