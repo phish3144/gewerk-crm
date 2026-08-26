@@ -4,7 +4,13 @@
 |---|---|
 | `tokens.css` | Die 13 Farbrollen in Tag und Nacht, dazu Schrift, Flächengrößen, Abstände, Radien und die Datenfarben |
 | `basis.css` | Dünne Bausteinschicht darauf: Tasten, Abzeichen, Eingabefeld, Karte, Titelzeile |
-| `vorschau.html` | Dieselbe Seite in beiden Modi, mit funktionierendem Umschalter |
+| `vorschau.vorlage.html` | Quelle der Vorschau, verweist auf die beiden Stylesheets |
+| `vorschau.html` | Daraus gebaut, mit eingebettetem CSS — funktioniert auch allein |
+
+Gebaut wird sie mit `node scripts/vorschau-bauen.mjs`. Der Umweg hat einen
+Grund: eine Seite mit relativen Stylesheet-Verweisen rendert nackt, sobald sie
+ohne ihre Nachbardateien geöffnet wird. Genau das ist beim ersten Versand
+passiert.
 
 ## Prüfen
 
@@ -22,6 +28,11 @@ Prüft drei Dinge und meldet sich mit Exit 1, wenn eines davon bricht:
    Browser nicht auf; sie fällt still auf nichts zurück.
 3. **Kontrast.** Jede Vordergrund/Hintergrund-Paarung in beiden Modi, Schrift
    gegen 4,5:1 und Bedienelemente gegen 3:1.
+4. **Kombinationen.** Jede Regel in `basis.css`, die Fläche *und* Tinte setzt,
+   wird automatisch geprüft — die Paarungen werden aus dem Stylesheet gelesen,
+   nicht aus einer gepflegten Liste. Ohne diesen Schritt blieb die Stopp-Taste
+   im Tag-Modus bei 2,70:1 unentdeckt: beide Token waren für sich in Ordnung,
+   falsch war erst ihre Kombination.
 
 ## Zwei Entscheidungen, die nicht offensichtlich sind
 

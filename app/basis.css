@@ -63,7 +63,7 @@ a:hover { text-decoration: underline; }
 }
 .taste-primaer   { background: var(--akzent-flaeche); color: var(--akzent-tinte); }
 .taste-sekundaer { background: transparent; color: var(--schrift); border-color: var(--rahmen-bedienelement); }
-.taste-gefahr    { background: var(--gefahr); color: var(--akzent-tinte); }
+.taste-gefahr    { background: var(--gefahr); color: var(--gefahr-tinte); }
 /* Auf der Baustelle traegt die eine Hauptaktion des Bildschirms 76 px. */
 .taste-baustelle {
   min-height: var(--ziel-primaer); width: 100%;
@@ -78,7 +78,7 @@ a:hover { text-decoration: underline; }
   font-size: 12px; font-weight: 600;
 }
 .abzeichen-wartet   { background: var(--akzent-grund); color: var(--akzent-schrift); }
-.abzeichen-erfolg   { background: color-mix(in srgb, var(--erfolg) 14%, var(--grund)); color: var(--erfolg); }
+.abzeichen-erfolg   { background: var(--erfolg-grund); color: var(--erfolg); }
 .abzeichen-kritisch { background: var(--gefahr-grund); color: var(--gefahr); }
 
 /* -- Eingabe -------------------------------------------------------------- */

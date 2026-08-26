@@ -42,7 +42,7 @@ if (abweichend.length || fehlend.length) {
 // auf - sie faellt still auf den Vorgabewert zurueck oder auf gar nichts.
 {
   const basis = readFileSync(new URL("../app/basis.css", import.meta.url), "utf8");
-  const vorschau = readFileSync(new URL("../app/vorschau.html", import.meta.url), "utf8");
+  const vorschau = readFileSync(new URL("../app/vorschau.vorlage.html", import.meta.url), "utf8");
   const definiert = new Set([...css.matchAll(/--([\w-]+):/g)].map(m => m[1]));
   const benutzt = new Set(
     [...(css + basis + vorschau).matchAll(/var\(--([\w-]+)/g)].map(m => m[1])
@@ -76,6 +76,7 @@ const PAARE = [
   ["material",            ["grund", "flaeche"],                    4.5],
   ["erfolg",              ["grund", "flaeche"],                    4.5],
   ["gefahr",              ["grund", "flaeche", "gefahr-grund"],    4.5],
+  ["erfolg",              ["erfolg-grund"],                        4.5],
   // --rahmen ist eine Trennlinie zwischen Flaechen und traegt keine
   // Information; WCAG 1.4.11 greift dort nicht. Der Rand eines Bedienelements
   // schon - er ist das, woran man das Element ueberhaupt erkennt.
@@ -105,6 +106,43 @@ for (const [name, werte] of [["Tag", tag], ["Nacht", nacht]]) {
         `--${vorn} auf --${h}`
       );
     }
+  }
+}
+
+// Jede Regel in basis.css, die Flaeche UND Tinte setzt, wird automatisch
+// geprueft. Eine handgepflegte Liste haette den Fall uebersehen, der beim
+// Ansehen des Rendings auffiel: die Stopp-Taste trug im Tagmodus dunkle Tinte
+// auf dunkelrotem Grund (2,70:1). Der Fehler steckte nicht in einem Token,
+// sondern in ihrer Kombination.
+{
+  const basis = readFileSync(new URL("../app/basis.css", import.meta.url), "utf8");
+  const paare = [];
+  const ungeprueft = [];
+  for (const block of basis.split("}")) {
+    const flaeche = block.match(/background:\s*var\(--([\w-]+)\)/);
+    const tinte   = block.match(/(?:^|[\s;{])color:\s*var\(--([\w-]+)\)/);
+    const zeilen  = block.split("{")[0].trim().split("\n").filter(z => !z.trim().startsWith("/*") && !z.trim().startsWith("*"));
+    const wahl    = (zeilen[zeilen.length - 1] || "?").trim();
+    if (block.includes("background:") && block.includes("color-mix")) {
+      ungeprueft.push(wahl);
+      continue;
+    }
+    if (flaeche && tinte) paare.push([wahl, tinte[1], flaeche[1]]);
+  }
+
+  console.log("\nKombinationen aus basis.css");
+  for (const [name, werte] of [["Tag", tag], ["Nacht", nacht]]) {
+    for (const [wahl, vorn, hinten] of paare) {
+      const v = werte[vorn], g = werte[hinten];
+      if (!v || !g || !v.startsWith("#") || !g.startsWith("#")) continue;
+      const k = kontrast(v, g);
+      const ok = k >= 4.5;
+      if (!ok) fehler++;
+      console.log(`  ${ok ? "OK  " : "FAIL"} ${k.toFixed(2).padStart(5)}:1  ${name.padEnd(5)} ${wahl}  --${vorn} auf --${hinten}`);
+    }
+  }
+  if (ungeprueft.length) {
+    console.log(`  nicht automatisch pruefbar (color-mix): ${[...new Set(ungeprueft)].join(", ")}`);
   }
 }
 

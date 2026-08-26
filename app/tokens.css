@@ -29,10 +29,12 @@
   --akzent-grund:       #FDF3D6;
   --material:           #1F5FC0;
   --erfolg:             #12794F;
+  --erfolg-grund:       #E4F4EB;
 
   /* Gefahr gehoert nicht zu den 13 Rollen, wird aber in beiden Modi
      gebraucht: ueberfaellige Forderungen, Stopp-Taste, Stornowarnung. */
   --gefahr:             #B3261E;
+  --gefahr-tinte:       #FFFFFF;
   --gefahr-grund:       #FCE9E7;
 
   /* -- Datenfarben ------------------------------------------------------- *
@@ -106,7 +108,9 @@
   --akzent-grund:       #3A2E10;
   --material:           #7FB5FF;
   --erfolg:             #5FD08A;
+  --erfolg-grund:       #14301F;
   --gefahr:             #FF6B5E;
+  --gefahr-tinte:       #17191B;
   --gefahr-grund:       #3D1B18;
 
   --daten-1:            #3987e5;
@@ -135,7 +139,9 @@
     --akzent-grund:       #3A2E10;
     --material:           #7FB5FF;
     --erfolg:             #5FD08A;
+    --erfolg-grund:       #14301F;
     --gefahr:             #FF6B5E;
+    --gefahr-tinte:       #17191B;
     --gefahr-grund:       #3D1B18;
 
     --daten-1:            #3987e5;

@@ -5,8 +5,291 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gewerk CRM — Token-Vorschau</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tokens.css">
-<link rel="stylesheet" href="basis.css">
+<style>
+/* tokens.css */
+/* ---------------------------------------------------------------------------
+   Gewerk CRM — Gestaltungstoken
+   Abgeleitet aus dem Entwurfscanvas, Richtung "Werkstatt".
+
+   Tag ist der Grundzustand auf :root. Nacht kommt auf zwei Wegen:
+   ueber [data-theme="nacht"], wenn der Nutzer den Umschalter bedient hat,
+   und ueber prefers-color-scheme, solange er es nicht getan hat.
+
+   Die Kontrastwerte in den Kommentaren sind gemessen, nicht geschaetzt:
+   node scripts/kontrast.mjs
+--------------------------------------------------------------------------- */
+
+:root {
+  /* -- Die 13 Rollen, Tag ------------------------------------------------ */
+  --grund:              #FFFFFF;
+  --flaeche:            #F4F4F2;
+  --flaeche-gehoben:    #EBEBE8;
+  /* Zwei Rahmen, weil sie zwei Aufgaben haben: eine Trennlinie zwischen
+     Karten darf leise sein, der Rand eines Eingabefelds nicht - er ist das,
+     woran man das Bedienelement ueberhaupt erkennt (WCAG 1.4.11). */
+  --rahmen:               #D6D6D1;
+  --rahmen-bedienelement: #868B90;
+  --schrift:            #1A1C1E;
+  --schrift-gedaempft:  #55606A;
+  --schrift-schwach:    #666F78;
+  --akzent-flaeche:     #FFC72C;
+  --akzent-tinte:       #17191B;
+  --akzent-schrift:     #8A6100;
+  --akzent-grund:       #FDF3D6;
+  --material:           #1F5FC0;
+  --erfolg:             #12794F;
+  --erfolg-grund:       #E4F4EB;
+
+  /* Gefahr gehoert nicht zu den 13 Rollen, wird aber in beiden Modi
+     gebraucht: ueberfaellige Forderungen, Stopp-Taste, Stornowarnung. */
+  --gefahr:             #B3261E;
+  --gefahr-tinte:       #FFFFFF;
+  --gefahr-grund:       #FCE9E7;
+
+  /* -- Datenfarben ------------------------------------------------------- *
+     Bewusst NICHT die Akzentfarben. Signalgelb liegt bei OKLCH L 0.857 und
+     damit weit ausserhalb des Bandes fuer Datenmarken. Diese vier Stufen
+     sind validiert: im Band, >=3:1 auf der Flaeche, Farbfehlsichtigkeit
+     geprueft. Reihenfolge ist fest und wird nie zyklisch vergeben.         */
+  --daten-1:            #2a78d6;
+  --daten-2:            #eb6834;
+  --daten-3:            #1baf7a;
+  --daten-4:            #eda100;
+  /* Fremdleistung traegt zusaetzlich eine Schraffur: erkennbar ohne
+     Farbvergleich. */
+  --daten-fremd:        repeating-linear-gradient(135deg, #eda100 0 7px, #c98500 7px 14px);
+
+  /* -- Schrift ----------------------------------------------------------- */
+  --schriftart-anzeige: "Barlow Condensed", "Helvetica Neue", Arial, sans-serif;
+  --schriftart-text:    Barlow, "Helvetica Neue", Arial, sans-serif;
+  --schriftart-zahl:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --groesse-seitentitel:   30px;
+  --groesse-kartentitel:   19px;
+  --groesse-gruppenlabel:  16px;
+  --groesse-zeilentitel:   15px;
+  --groesse-text:          15px;
+  --groesse-zusatz:        13px;
+  --groesse-kennzahl:      34px;
+  --groesse-tabellenzahl:  14px;
+
+  --laufweite-anzeige:  0.01em;
+  --laufweite-label:    0.08em;
+
+  /* -- Flaechengroessen --------------------------------------------------- *
+     Gemessen mit Arbeitshandschuhen. 44px ist die Untergrenze, nicht das
+     Ziel: die primaere Aktion eines Bildschirms bekommt 76px.              */
+  --ziel-primaer:    76px;
+  --ziel-liste:      68px;
+  --ziel-navigation: 57px;
+  --ziel-minimum:    44px;
+
+  /* -- Abstaende, Radien ------------------------------------------------- */
+  --abstand-1: 4px;
+  --abstand-2: 8px;
+  --abstand-3: 12px;
+  --abstand-4: 16px;
+  --abstand-5: 24px;
+  --abstand-6: 32px;
+
+  --radius-klein: 6px;
+  --radius:       8px;
+  --radius-gross: 12px;
+  --radius-karte: 14px;
+  --radius-pille: 999px;
+
+  color-scheme: light;
+}
+
+/* -- Nacht, ausdruecklich gewaehlt ---------------------------------------- */
+[data-theme="nacht"] {
+  --grund:              #17191B;
+  --flaeche:            #212528;
+  --flaeche-gehoben:    #1D2023;
+  --rahmen:             #383D42;
+  --rahmen-bedienelement: #6E757D;
+  --schrift:            #F4F6F7;
+  --schrift-gedaempft:  #98A1A8;
+  --schrift-schwach:    #8B959C;
+  --akzent-flaeche:     #FFC72C;
+  --akzent-tinte:       #17191B;
+  --akzent-schrift:     #FFC72C;
+  --akzent-grund:       #3A2E10;
+  --material:           #7FB5FF;
+  --erfolg:             #5FD08A;
+  --erfolg-grund:       #14301F;
+  --gefahr:             #FF6B5E;
+  --gefahr-tinte:       #17191B;
+  --gefahr-grund:       #3D1B18;
+
+  --daten-1:            #3987e5;
+  --daten-2:            #d95926;
+  --daten-3:            #199e70;
+  --daten-4:            #c98500;
+  --daten-fremd:        repeating-linear-gradient(135deg, #c98500 0 7px, #a86f00 7px 14px);
+
+  color-scheme: dark;
+}
+
+/* -- Nacht, weil das System es vorgibt und niemand widersprochen hat ------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="tag"]) {
+    --grund:              #17191B;
+    --flaeche:            #212528;
+    --flaeche-gehoben:    #1D2023;
+    --rahmen:             #383D42;
+    --rahmen-bedienelement: #6E757D;
+    --schrift:            #F4F6F7;
+    --schrift-gedaempft:  #98A1A8;
+    --schrift-schwach:    #8B959C;
+    --akzent-flaeche:     #FFC72C;
+    --akzent-tinte:       #17191B;
+    --akzent-schrift:     #FFC72C;
+    --akzent-grund:       #3A2E10;
+    --material:           #7FB5FF;
+    --erfolg:             #5FD08A;
+    --erfolg-grund:       #14301F;
+    --gefahr:             #FF6B5E;
+    --gefahr-tinte:       #17191B;
+    --gefahr-grund:       #3D1B18;
+
+    --daten-1:            #3987e5;
+    --daten-2:            #d95926;
+    --daten-3:            #199e70;
+    --daten-4:            #c98500;
+    --daten-fremd:        repeating-linear-gradient(135deg, #c98500 0 7px, #a86f00 7px 14px);
+
+    color-scheme: dark;
+  }
+}
+</style>
+<style>
+/* basis.css */
+/* Bausteine auf den Token. Bewusst duenn: jede Regel greift ausschliesslich
+   auf Variablen zu, damit der Umschalter ohne Sonderfaelle wirkt. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--grund);
+  color: var(--schrift);
+  font-family: var(--schriftart-text);
+  font-size: var(--groesse-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--akzent-schrift); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* -- Schrift -------------------------------------------------------------- */
+.seitentitel {
+  font-family: var(--schriftart-anzeige); font-weight: 700;
+  font-size: var(--groesse-seitentitel); letter-spacing: var(--laufweite-anzeige);
+  text-transform: uppercase; margin: 0;
+}
+.kartentitel {
+  font-family: var(--schriftart-anzeige); font-weight: 700;
+  font-size: var(--groesse-kartentitel); letter-spacing: 0.03em;
+  text-transform: uppercase; margin: 0;
+}
+.gruppenlabel {
+  font-family: var(--schriftart-anzeige); font-weight: 600;
+  font-size: var(--groesse-gruppenlabel); letter-spacing: var(--laufweite-label);
+  color: var(--schrift-schwach); text-transform: uppercase;
+}
+.zeilentitel { font-weight: 600; font-size: var(--groesse-zeilentitel); }
+.zusatz      { font-size: var(--groesse-zusatz); color: var(--schrift-gedaempft); }
+.kennzahl {
+  font-family: var(--schriftart-zahl); font-weight: 500;
+  font-size: var(--groesse-kennzahl); letter-spacing: -0.02em;
+}
+/* Zahlen stehen in Spalten exakt untereinander - deshalb Tabellenziffern. */
+.zahl {
+  font-family: var(--schriftart-zahl); font-size: var(--groesse-tabellenzahl);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -- Flaechen ------------------------------------------------------------- */
+.karte {
+  background: var(--flaeche);
+  border: 1px solid var(--rahmen);
+  border-radius: var(--radius-gross);
+  padding: var(--abstand-5);
+}
+
+/* -- Tasten --------------------------------------------------------------- */
+.taste {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--abstand-2);
+  min-height: var(--ziel-minimum);
+  padding: var(--abstand-3) var(--abstand-5);
+  border-radius: var(--radius);
+  font-family: inherit; font-size: var(--groesse-text); font-weight: 600;
+  border: 1px solid transparent; cursor: pointer;
+}
+.taste-primaer   { background: var(--akzent-flaeche); color: var(--akzent-tinte); }
+.taste-sekundaer { background: transparent; color: var(--schrift); border-color: var(--rahmen-bedienelement); }
+.taste-gefahr    { background: var(--gefahr); color: var(--gefahr-tinte); }
+/* Auf der Baustelle traegt die eine Hauptaktion des Bildschirms 76 px. */
+.taste-baustelle {
+  min-height: var(--ziel-primaer); width: 100%;
+  font-family: var(--schriftart-anzeige); font-size: 26px; letter-spacing: 0.02em;
+  text-transform: uppercase; border-radius: var(--radius-karte);
+}
+
+/* -- Abzeichen ------------------------------------------------------------ */
+.abzeichen {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 11px; border-radius: var(--radius-pille);
+  font-size: 12px; font-weight: 600;
+}
+.abzeichen-wartet   { background: var(--akzent-grund); color: var(--akzent-schrift); }
+.abzeichen-erfolg   { background: var(--erfolg-grund); color: var(--erfolg); }
+.abzeichen-kritisch { background: var(--gefahr-grund); color: var(--gefahr); }
+
+/* -- Eingabe -------------------------------------------------------------- */
+.feld {
+  display: block; width: 100%;
+  min-height: var(--ziel-minimum);
+  padding: var(--abstand-3) var(--abstand-4);
+  background: var(--flaeche);
+  color: var(--schrift);
+  border: 1px solid var(--rahmen-bedienelement);
+  border-radius: var(--radius);
+  font-family: inherit; font-size: var(--groesse-text);
+}
+.feld::placeholder { color: var(--schrift-schwach); }
+.feld:focus-visible, .taste:focus-visible {
+  outline: 2px solid var(--akzent-schrift); outline-offset: 2px;
+}
+
+/* -- Titelzeile im Leistungsverzeichnis ----------------------------------- */
+.titelzeile {
+  background: var(--flaeche);
+  border-left: 3px solid var(--akzent-flaeche);
+  border-radius: 0 var(--radius-klein) var(--radius-klein) 0;
+  padding: var(--abstand-3) var(--abstand-4);
+  font-family: var(--schriftart-anzeige); font-weight: 700;
+  font-size: 17px; letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+/* -- Offline-Hinweis ------------------------------------------------------ */
+/* Der Zustand wird angezeigt, nicht verschwiegen: eine stille Warteschlange
+   ist der haeufigste Vertrauensbruch mobiler Baustellen-Apps. */
+.offline {
+  display: flex; align-items: center; gap: var(--abstand-3);
+  background: var(--akzent-grund);
+  border-left: 3px solid var(--akzent-flaeche);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--abstand-3) var(--abstand-4);
+  color: var(--akzent-schrift); font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+</style>
 <style>
   .huelle { max-width: 980px; margin: 0 auto; padding: var(--abstand-6) var(--abstand-5) 64px; }
   .kopf { display: flex; align-items: center; justify-content: space-between; gap: var(--abstand-4);
