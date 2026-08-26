@@ -1,0 +1,33 @@
+{
+  "name": "gewerk-crm-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/stile-holen.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/stile-holen.mjs",
+    "build": "next build",
+    "start": "next start",
+    "typen": "tsc --noEmit",
+    "pruefen": "npm run typen && npm run build && node scripts/kein-dienstschluessel.mjs",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:deploy": "opennextjs-cloudflare deploy",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.86.0",
+    "next": "16.3.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.3",
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.125.0"
+  }
+}

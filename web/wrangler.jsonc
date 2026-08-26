@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gewerk-crm",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Der Bucket traegt die Jurisdiktion EU und ist ohne diese Angabe nicht
+  // aufloesbar - siehe docs/architektur.md.
+  "r2_buckets": [
+    {
+      "binding": "DOKUMENTE",
+      "bucket_name": "gewerk-crm-storage",
+      "jurisdiction": "eu"
+    }
+  ]
+}

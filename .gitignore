@@ -3,3 +3,10 @@
 node_modules/
 .next/
 .open-next/
+
+# Von scripts/stile-holen.mjs erzeugte Kopien der Tokens.
+web/app/stile/*.css
+# Ergebnisse der Oberflaechentests.
+web/test-results/
+web/playwright-report/
+*.tsbuildinfo

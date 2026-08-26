@@ -1,0 +1,5 @@
+/* tokens.css und basis.css sind Kopien aus app/ im Wurzelverzeichnis und
+   werden von scripts/stile-holen.mjs vor jedem Lauf erneuert. */
+@import "./stile/tokens.css";
+@import "./stile/basis.css";
+@import "./stile/anwendung.css";
