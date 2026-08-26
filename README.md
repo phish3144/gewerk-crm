@@ -14,6 +14,7 @@ recherchebasierten Umsetzungsplan.
 | [docs/architektur.md](docs/architektur.md) | Stack-Entscheidung, Kostenmodell, Deployment |
 | [docs/datenmodell.md](docs/datenmodell.md) | Schema, RLS-Mandantentrennung, GoBD-Unveränderbarkeit |
 | [docs/roadmap.md](docs/roadmap.md) | Phasen, Reihenfolge, Abbruchkriterien |
+| [docs/usp.md](docs/usp.md) | Wo der echte Mehrwert liegt — Marktlücke, vier Funktionen, Reihenfolge |
 | [docs/offene-fragen.md](docs/offene-fragen.md) | Was **nicht** belegt ist und vor der Umsetzung geklärt werden muss |
 
 ## Methodik
