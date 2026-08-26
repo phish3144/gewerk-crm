@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gewerk CRM — Token-Vorschau</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .huelle { max-width: 980px; margin: 0 auto; padding: var(--abstand-6) var(--abstand-5) 64px; }
+  .kopf { display: flex; align-items: center; justify-content: space-between; gap: var(--abstand-4);
+          padding-bottom: var(--abstand-5); border-bottom: 1px solid var(--rahmen); margin-bottom: var(--abstand-6); }
+  .umschalter { display: flex; gap: 3px; background: var(--flaeche); border: 1px solid var(--rahmen-bedienelement);
+                border-radius: var(--radius); padding: 3px; }
+  .umschalter button { min-height: var(--ziel-minimum); min-width: var(--ziel-minimum);
+                       display: flex; align-items: center; justify-content: center;
+                       background: transparent; border: 0; border-radius: var(--radius-klein);
+                       color: var(--schrift-schwach); cursor: pointer; }
+  .umschalter button[aria-pressed="true"] { background: var(--flaeche-gehoben); color: var(--akzent-schrift); }
+  section { margin-bottom: var(--abstand-6); }
+  h2 { font-family: var(--schriftart-anzeige); font-weight: 700; font-size: 21px;
+       letter-spacing: 0.04em; text-transform: uppercase; margin: 0 0 var(--abstand-4); }
+  .reihe { display: flex; flex-wrap: wrap; gap: var(--abstand-3); align-items: center; }
+  .raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: var(--abstand-3); }
+  .muster { display: flex; align-items: center; gap: var(--abstand-3);
+            border: 1px solid var(--rahmen); border-radius: var(--radius); padding: var(--abstand-3); }
+  .tupfen { width: 26px; height: 26px; border-radius: var(--radius-klein); flex-shrink: 0;
+            box-shadow: inset 0 0 0 1px rgb(128 128 128 / .28); }
+  .balken { height: 22px; border-radius: 0 4px 4px 0; }
+</style>
+</head>
+<body>
+<div class="huelle">
+
+  <div class="kopf">
+    <div>
+      <h1 class="seitentitel">Token-Vorschau</h1>
+      <div class="zusatz">Dieselbe Seite, beide Modi. Nur 15 Variablen wechseln.</div>
+    </div>
+    <div class="umschalter" role="group" aria-label="Darstellung">
+      <button id="tag" aria-pressed="false" aria-label="Tagmodus">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M3 12h1.5M19.5 12H21M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"/></svg>
+      </button>
+      <button id="nacht" aria-pressed="false" aria-label="Nachtmodus">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <section>
+    <h2>Tasten</h2>
+    <div class="reihe">
+      <button class="taste taste-primaer">Festschreiben</button>
+      <button class="taste taste-sekundaer">Vorschau</button>
+      <button class="taste taste-gefahr">Stopp</button>
+    </div>
+    <div style="max-width: 340px; margin-top: var(--abstand-3);">
+      <button class="taste taste-primaer taste-baustelle">Foto aufnehmen</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Status</h2>
+    <div class="reihe">
+      <span class="abzeichen abzeichen-wartet">Wartet</span>
+      <span class="abzeichen abzeichen-erfolg">Gesendet</span>
+      <span class="abzeichen abzeichen-kritisch">Kritisch</span>
+    </div>
+    <div class="offline" style="margin-top: var(--abstand-3);">Offline &ndash; 3 Eintr&auml;ge warten</div>
+  </section>
+
+  <section>
+    <h2>Eingabe und Beleg</h2>
+    <input class="feld" placeholder="Artikel oder Nummer suchen" style="max-width: 340px;">
+    <div class="titelzeile" style="margin-top: var(--abstand-4);">Titel 1 &middot; Elektroinstallation</div>
+    <div class="karte" style="margin-top: var(--abstand-3);">
+      <div class="gruppenlabel">Summen</div>
+      <div style="display:flex; justify-content:space-between; margin-top: var(--abstand-3);">
+        <span class="zusatz">Netto</span><span class="zahl">13.090,40 &euro;</span></div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top: var(--abstand-2);">
+        <span class="zeilentitel">Brutto</span>
+        <span class="kennzahl" style="color: var(--akzent-schrift);">15.577,58</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Datenfarben</h2>
+    <div class="zusatz" style="margin-bottom: var(--abstand-3);">
+      Bewusst nicht die Akzentfarben. Jede Marke tr&auml;gt eine direkte Beschriftung,
+      Fremdleistung zus&auml;tzlich eine Schraffur.
+    </div>
+    <div class="raster">
+      <div class="muster"><span class="tupfen" style="background: var(--daten-1)"></span><span>Kolonne Nord</span></div>
+      <div class="muster"><span class="tupfen" style="background: var(--daten-2)"></span><span>Kolonne S&uuml;d</span></div>
+      <div class="muster"><span class="tupfen" style="background: var(--daten-3)"></span><span>Kolonne Ost</span></div>
+      <div class="muster"><span class="tupfen" style="background: var(--daten-fremd)"></span><span>Subunternehmer</span></div>
+    </div>
+    <div class="karte" style="margin-top: var(--abstand-3);">
+      <div class="gruppenlabel">Forderungen nach Alter</div>
+      <div style="display:grid; grid-template-columns: 150px 1fr 110px; gap: var(--abstand-3); align-items:center; margin-top: var(--abstand-3);">
+        <span class="zusatz">nicht f&auml;llig</span>
+        <div style="background: var(--flaeche-gehoben); border-radius:4px;"><div class="balken" style="width:100%; background: var(--daten-4)"></div></div>
+        <span class="zahl" style="text-align:right;">34.840 &euro;</span>
+        <span class="zusatz">&uuml;ber 60 Tage <span class="abzeichen abzeichen-kritisch" style="padding:1px 7px;">kritisch</span></span>
+        <div style="background: var(--flaeche-gehoben); border-radius:4px;"><div class="balken" style="width:4%; background: var(--daten-4)"></div></div>
+        <span class="zahl" style="text-align:right;">1.400 &euro;</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Fl&auml;chengr&ouml;&szlig;en</h2>
+    <div style="display:flex; flex-direction:column; gap: var(--abstand-2); max-width: 420px;">
+      <div style="height: var(--ziel-primaer); background: var(--akzent-flaeche); color: var(--akzent-tinte); border-radius: var(--radius-karte); display:flex; align-items:center; padding: 0 var(--abstand-4); font-weight:600;">Prim&auml;re Aktion &middot; 76 px</div>
+      <div style="height: var(--ziel-liste); background: var(--flaeche); border:1px solid var(--rahmen); border-radius: var(--radius-gross); display:flex; align-items:center; padding: 0 var(--abstand-4);">Listeneintrag &middot; 68 px</div>
+      <div style="height: var(--ziel-navigation); background: var(--flaeche); border:1px solid var(--rahmen); border-radius: var(--radius); display:flex; align-items:center; padding: 0 var(--abstand-4);">Navigationsziel &middot; 57 px</div>
+      <div style="height: var(--ziel-minimum); border:1px dashed var(--rahmen-bedienelement); border-radius: var(--radius); display:flex; align-items:center; padding: 0 var(--abstand-4); color: var(--schrift-gedaempft);">Untergrenze &middot; 44 px</div>
+    </div>
+  </section>
+
+</div>
+<script>
+  const wurzel = document.documentElement;
+  const tasten = { tag: document.getElementById("tag"), nacht: document.getElementById("nacht") };
+  // Ohne gespeicherte Wahl entscheidet das Betriebssystem - dann ist keine
+  // der beiden Tasten gedrueckt, weil der Nutzer nichts gewaehlt hat.
+  const setzen = (modus) => {
+    if (modus) { wurzel.setAttribute("data-theme", modus); }
+    else { wurzel.removeAttribute("data-theme"); }
+    tasten.tag.setAttribute("aria-pressed", String(modus === "tag"));
+    tasten.nacht.setAttribute("aria-pressed", String(modus === "nacht"));
+    try { modus ? localStorage.setItem("modus", modus) : localStorage.removeItem("modus"); } catch (e) {}
+  };
+  let gespeichert = null;
+  try { gespeichert = localStorage.getItem("modus"); } catch (e) {}
+  setzen(gespeichert);
+  tasten.tag.onclick   = () => setzen(wurzel.getAttribute("data-theme") === "tag"   ? null : "tag");
+  tasten.nacht.onclick = () => setzen(wurzel.getAttribute("data-theme") === "nacht" ? null : "nacht");
+</script>
+</body>
+</html>

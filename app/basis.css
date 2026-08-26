@@ -1,0 +1,124 @@
+/* Bausteine auf den Token. Bewusst duenn: jede Regel greift ausschliesslich
+   auf Variablen zu, damit der Umschalter ohne Sonderfaelle wirkt. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--grund);
+  color: var(--schrift);
+  font-family: var(--schriftart-text);
+  font-size: var(--groesse-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--akzent-schrift); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* -- Schrift -------------------------------------------------------------- */
+.seitentitel {
+  font-family: var(--schriftart-anzeige); font-weight: 700;
+  font-size: var(--groesse-seitentitel); letter-spacing: var(--laufweite-anzeige);
+  text-transform: uppercase; margin: 0;
+}
+.kartentitel {
+  font-family: var(--schriftart-anzeige); font-weight: 700;
+  font-size: var(--groesse-kartentitel); letter-spacing: 0.03em;
+  text-transform: uppercase; margin: 0;
+}
+.gruppenlabel {
+  font-family: var(--schriftart-anzeige); font-weight: 600;
+  font-size: var(--groesse-gruppenlabel); letter-spacing: var(--laufweite-label);
+  color: var(--schrift-schwach); text-transform: uppercase;
+}
+.zeilentitel { font-weight: 600; font-size: var(--groesse-zeilentitel); }
+.zusatz      { font-size: var(--groesse-zusatz); color: var(--schrift-gedaempft); }
+.kennzahl {
+  font-family: var(--schriftart-zahl); font-weight: 500;
+  font-size: var(--groesse-kennzahl); letter-spacing: -0.02em;
+}
+/* Zahlen stehen in Spalten exakt untereinander - deshalb Tabellenziffern. */
+.zahl {
+  font-family: var(--schriftart-zahl); font-size: var(--groesse-tabellenzahl);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -- Flaechen ------------------------------------------------------------- */
+.karte {
+  background: var(--flaeche);
+  border: 1px solid var(--rahmen);
+  border-radius: var(--radius-gross);
+  padding: var(--abstand-5);
+}
+
+/* -- Tasten --------------------------------------------------------------- */
+.taste {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--abstand-2);
+  min-height: var(--ziel-minimum);
+  padding: var(--abstand-3) var(--abstand-5);
+  border-radius: var(--radius);
+  font-family: inherit; font-size: var(--groesse-text); font-weight: 600;
+  border: 1px solid transparent; cursor: pointer;
+}
+.taste-primaer   { background: var(--akzent-flaeche); color: var(--akzent-tinte); }
+.taste-sekundaer { background: transparent; color: var(--schrift); border-color: var(--rahmen-bedienelement); }
+.taste-gefahr    { background: var(--gefahr); color: var(--akzent-tinte); }
+/* Auf der Baustelle traegt die eine Hauptaktion des Bildschirms 76 px. */
+.taste-baustelle {
+  min-height: var(--ziel-primaer); width: 100%;
+  font-family: var(--schriftart-anzeige); font-size: 26px; letter-spacing: 0.02em;
+  text-transform: uppercase; border-radius: var(--radius-karte);
+}
+
+/* -- Abzeichen ------------------------------------------------------------ */
+.abzeichen {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 11px; border-radius: var(--radius-pille);
+  font-size: 12px; font-weight: 600;
+}
+.abzeichen-wartet   { background: var(--akzent-grund); color: var(--akzent-schrift); }
+.abzeichen-erfolg   { background: color-mix(in srgb, var(--erfolg) 14%, var(--grund)); color: var(--erfolg); }
+.abzeichen-kritisch { background: var(--gefahr-grund); color: var(--gefahr); }
+
+/* -- Eingabe -------------------------------------------------------------- */
+.feld {
+  display: block; width: 100%;
+  min-height: var(--ziel-minimum);
+  padding: var(--abstand-3) var(--abstand-4);
+  background: var(--flaeche);
+  color: var(--schrift);
+  border: 1px solid var(--rahmen-bedienelement);
+  border-radius: var(--radius);
+  font-family: inherit; font-size: var(--groesse-text);
+}
+.feld::placeholder { color: var(--schrift-schwach); }
+.feld:focus-visible, .taste:focus-visible {
+  outline: 2px solid var(--akzent-schrift); outline-offset: 2px;
+}
+
+/* -- Titelzeile im Leistungsverzeichnis ----------------------------------- */
+.titelzeile {
+  background: var(--flaeche);
+  border-left: 3px solid var(--akzent-flaeche);
+  border-radius: 0 var(--radius-klein) var(--radius-klein) 0;
+  padding: var(--abstand-3) var(--abstand-4);
+  font-family: var(--schriftart-anzeige); font-weight: 700;
+  font-size: 17px; letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+/* -- Offline-Hinweis ------------------------------------------------------ */
+/* Der Zustand wird angezeigt, nicht verschwiegen: eine stille Warteschlange
+   ist der haeufigste Vertrauensbruch mobiler Baustellen-Apps. */
+.offline {
+  display: flex; align-items: center; gap: var(--abstand-3);
+  background: var(--akzent-grund);
+  border-left: 3px solid var(--akzent-flaeche);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--abstand-3) var(--abstand-4);
+  color: var(--akzent-schrift); font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

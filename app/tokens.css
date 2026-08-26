@@ -1,79 +1,79 @@
-/*
- * Design-Tokens der Werkstatt-Richtung.
- *
- * Tag ist die Grundlage, Nacht die Umschaltung. Wer nichts wählt, bekommt das
- * Systemthema; wer wählt, bekommt seine Wahl — deshalb steht der Attribut-
- * Selektor hinter der Media Query und gewinnt in beide Richtungen.
- *
- * Die Rollen entsprechen eins zu eins dem Artboard "Farbrollen Tag / Nacht".
- * Kontrastwerte in den Kommentaren sind nachgerechnet, nicht geschätzt.
- */
+/* ---------------------------------------------------------------------------
+   Gewerk CRM — Gestaltungstoken
+   Abgeleitet aus dem Entwurfscanvas, Richtung "Werkstatt".
+
+   Tag ist der Grundzustand auf :root. Nacht kommt auf zwei Wegen:
+   ueber [data-theme="nacht"], wenn der Nutzer den Umschalter bedient hat,
+   und ueber prefers-color-scheme, solange er es nicht getan hat.
+
+   Die Kontrastwerte in den Kommentaren sind gemessen, nicht geschaetzt:
+   node scripts/kontrast.mjs
+--------------------------------------------------------------------------- */
 
 :root {
-  /* ---------------------------------------------------------- Flächen -- */
-  --grund:            #FFFFFF;
-  --flaeche:          #F4F4F2;
-  --flaeche-gehoben:  #EBEBE8;
-  --rahmen:           #D6D6D1;
-  --rahmen-zart:      #E4E4E0;
+  /* -- Die 13 Rollen, Tag ------------------------------------------------ */
+  --grund:              #FFFFFF;
+  --flaeche:            #F4F4F2;
+  --flaeche-gehoben:    #EBEBE8;
+  /* Zwei Rahmen, weil sie zwei Aufgaben haben: eine Trennlinie zwischen
+     Karten darf leise sein, der Rand eines Eingabefelds nicht - er ist das,
+     woran man das Bedienelement ueberhaupt erkennt (WCAG 1.4.11). */
+  --rahmen:               #D6D6D1;
+  --rahmen-bedienelement: #868B90;
+  --schrift:            #1A1C1E;
+  --schrift-gedaempft:  #55606A;
+  --schrift-schwach:    #666F78;
+  --akzent-flaeche:     #FFC72C;
+  --akzent-tinte:       #17191B;
+  --akzent-schrift:     #8A6100;
+  --akzent-grund:       #FDF3D6;
+  --material:           #1F5FC0;
+  --erfolg:             #12794F;
 
-  /* ------------------------------------------------------------ Schrift -- */
-  --schrift:          #1A1C1E;   /* 17,1:1 auf Grund */
-  --schrift-gedaempft:#5E656B;   /*  5,9:1 */
-  --schrift-schwach:  #878E94;
+  /* Gefahr gehoert nicht zu den 13 Rollen, wird aber in beiden Modi
+     gebraucht: ueberfaellige Forderungen, Stopp-Taste, Stornowarnung. */
+  --gefahr:             #B3261E;
+  --gefahr-grund:       #FCE9E7;
 
-  /* -------------------------------------------------------------- Akzent --
-   * Der Akzent lässt sich nicht spiegeln: Signalgelb erreicht auf Weiß nur
-   * 1,56:1 und ist als Schrift unlesbar. Als FLÄCHE bleibt es in beiden Modi
-   * identisch (11,3:1 mit anthrazitfarbener Tinte), als SCHRIFT tritt im
-   * Tag-Modus Bernstein an seine Stelle (5,5:1).                            */
-  --akzent-flaeche:   #FFC72C;
-  --akzent-tinte:     #17191B;   /* Schrift auf --akzent-flaeche */
-  --akzent-schrift:   #8A6100;
-  --akzent-grund:     #FDF3D6;
+  /* -- Datenfarben ------------------------------------------------------- *
+     Bewusst NICHT die Akzentfarben. Signalgelb liegt bei OKLCH L 0.857 und
+     damit weit ausserhalb des Bandes fuer Datenmarken. Diese vier Stufen
+     sind validiert: im Band, >=3:1 auf der Flaeche, Farbfehlsichtigkeit
+     geprueft. Reihenfolge ist fest und wird nie zyklisch vergeben.         */
+  --daten-1:            #2a78d6;
+  --daten-2:            #eb6834;
+  --daten-3:            #1baf7a;
+  --daten-4:            #eda100;
+  /* Fremdleistung traegt zusaetzlich eine Schraffur: erkennbar ohne
+     Farbvergleich. */
+  --daten-fremd:        repeating-linear-gradient(135deg, #eda100 0 7px, #c98500 7px 14px);
 
-  /* -------------------------------------------------------------- Status -- */
-  --erfolg:           #12794F;   /* 5,4:1 */
-  --erfolg-grund:     #E4F4EB;
-  --warnung:          #8A6100;
-  --warnung-grund:    #FDF3D6;
-  --gefahr:           #B3261E;
-  --gefahr-grund:     #FDECEA;
-  --material:         #2F6FD0;   /* 4,9:1 — Materialanteil in der Kalkulation */
+  /* -- Schrift ----------------------------------------------------------- */
+  --schriftart-anzeige: "Barlow Condensed", "Helvetica Neue", Arial, sans-serif;
+  --schriftart-text:    Barlow, "Helvetica Neue", Arial, sans-serif;
+  --schriftart-zahl:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* ------------------------------------------------------------- Diagramm --
-   * Bewusst NICHT die UI-Akzente. Datenmarken müssen im OKLCH-Band 0.48–0.67
-   * liegen; Signalgelb liegt bei 0.857 und fällt als Serienfarbe durch. Diese
-   * vier sind validiert: alle im Band, alle ≥3:1 auf der Fläche, schlechtestes
-   * Farbfehlsichtigkeits-Paar ΔE 8.4.                                        */
-  --serie-1:          #3987e5;
-  --serie-2:          #d95926;
-  --serie-3:          #199e70;
-  --serie-4:          #c98500;
-  --serie-spur:       #E4E4E0;   /* ungefüllter Teil eines Balkens */
+  --groesse-seitentitel:   30px;
+  --groesse-kartentitel:   19px;
+  --groesse-gruppenlabel:  16px;
+  --groesse-zeilentitel:   15px;
+  --groesse-text:          15px;
+  --groesse-zusatz:        13px;
+  --groesse-kennzahl:      34px;
+  --groesse-tabellenzahl:  14px;
 
-  /* ---------------------------------------------------------- Typografie -- */
-  --schrift-titel: "Barlow Condensed", "Helvetica Neue Condensed", sans-serif;
-  --schrift-text:  Barlow, "Helvetica Neue", system-ui, sans-serif;
-  --schrift-zahl:  "IBM Plex Mono", ui-monospace, monospace;
+  --laufweite-anzeige:  0.01em;
+  --laufweite-label:    0.08em;
 
-  --groesse-seitentitel: 30px;
-  --groesse-kartentitel: 19px;
-  --groesse-gruppe:      16px;
-  --groesse-zeile:       15px;
-  --groesse-text:        15px;
-  --groesse-zusatz:      13px;
-  --groesse-kennzahl:    34px;
-  --groesse-tabelle:     14px;
+  /* -- Flaechengroessen --------------------------------------------------- *
+     Gemessen mit Arbeitshandschuhen. 44px ist die Untergrenze, nicht das
+     Ziel: die primaere Aktion eines Bildschirms bekommt 76px.              */
+  --ziel-primaer:    76px;
+  --ziel-liste:      68px;
+  --ziel-navigation: 57px;
+  --ziel-minimum:    44px;
 
-  /* --------------------------------------------------------- Flächenmaße --
-   * Untergrenze 44 px, gemessen mit Arbeitshandschuhen. Die primäre Aktion
-   * eines Bildschirms bekommt 76 px — das ist eine Regel, keine Empfehlung.  */
-  --ziel-primaer:  76px;
-  --ziel-liste:    68px;
-  --ziel-navi:     57px;
-  --ziel-minimum:  44px;
-
+  /* -- Abstaende, Radien ------------------------------------------------- */
   --abstand-1: 4px;
   --abstand-2: 8px;
   --abstand-3: 12px;
@@ -82,83 +82,68 @@
   --abstand-6: 32px;
 
   --radius-klein: 6px;
-  --radius:       10px;
-  --radius-gross: 14px;
+  --radius:       8px;
+  --radius-gross: 12px;
+  --radius-karte: 14px;
+  --radius-pille: 999px;
+
+  color-scheme: light;
 }
 
-/* Nacht — nur die Rollen, die sich ändern. */
+/* -- Nacht, ausdruecklich gewaehlt ---------------------------------------- */
+[data-theme="nacht"] {
+  --grund:              #17191B;
+  --flaeche:            #212528;
+  --flaeche-gehoben:    #1D2023;
+  --rahmen:             #383D42;
+  --rahmen-bedienelement: #6E757D;
+  --schrift:            #F4F6F7;
+  --schrift-gedaempft:  #98A1A8;
+  --schrift-schwach:    #8B959C;
+  --akzent-flaeche:     #FFC72C;
+  --akzent-tinte:       #17191B;
+  --akzent-schrift:     #FFC72C;
+  --akzent-grund:       #3A2E10;
+  --material:           #7FB5FF;
+  --erfolg:             #5FD08A;
+  --gefahr:             #FF6B5E;
+  --gefahr-grund:       #3D1B18;
+
+  --daten-1:            #3987e5;
+  --daten-2:            #d95926;
+  --daten-3:            #199e70;
+  --daten-4:            #c98500;
+  --daten-fremd:        repeating-linear-gradient(135deg, #c98500 0 7px, #a86f00 7px 14px);
+
+  color-scheme: dark;
+}
+
+/* -- Nacht, weil das System es vorgibt und niemand widersprochen hat ------- */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="tag"]) {
-    --grund:            #17191B;
-    --flaeche:          #212528;
-    --flaeche-gehoben:  #1D2023;
-    --rahmen:           #383D42;
-    --rahmen-zart:      #212528;
+    --grund:              #17191B;
+    --flaeche:            #212528;
+    --flaeche-gehoben:    #1D2023;
+    --rahmen:             #383D42;
+    --rahmen-bedienelement: #6E757D;
+    --schrift:            #F4F6F7;
+    --schrift-gedaempft:  #98A1A8;
+    --schrift-schwach:    #8B959C;
+    --akzent-flaeche:     #FFC72C;
+    --akzent-tinte:       #17191B;
+    --akzent-schrift:     #FFC72C;
+    --akzent-grund:       #3A2E10;
+    --material:           #7FB5FF;
+    --erfolg:             #5FD08A;
+    --gefahr:             #FF6B5E;
+    --gefahr-grund:       #3D1B18;
 
-    --schrift:          #F4F6F7;   /* 16,3:1 auf Grund */
-    --schrift-gedaempft:#98A1A8;   /*  6,7:1 */
-    --schrift-schwach:  #6F7A81;
+    --daten-1:            #3987e5;
+    --daten-2:            #d95926;
+    --daten-3:            #199e70;
+    --daten-4:            #c98500;
+    --daten-fremd:        repeating-linear-gradient(135deg, #c98500 0 7px, #a86f00 7px 14px);
 
-    --akzent-schrift:   #FFC72C;   /* 11,3:1 — auf dunklem Grund tragfähig */
-    --akzent-grund:     #3A2E10;
-
-    --erfolg:           #5FD08A;
-    --erfolg-grund:     #14301F;
-    --warnung:          #FFC72C;
-    --warnung-grund:    #3A2E10;
-    --gefahr:           #FF6B5E;
-    --gefahr-grund:     #3D1B18;
-    --material:         #7FB5FF;
-
-    --serie-spur:       #2A2E32;
+    color-scheme: dark;
   }
-}
-
-/* Ausdrückliche Wahl gewinnt gegen das Systemthema, in beide Richtungen. */
-:root[data-theme="nacht"] {
-  --grund:            #17191B;
-  --flaeche:          #212528;
-  --flaeche-gehoben:  #1D2023;
-  --rahmen:           #383D42;
-  --rahmen-zart:      #212528;
-
-  --schrift:          #F4F6F7;
-  --schrift-gedaempft:#98A1A8;
-  --schrift-schwach:  #6F7A81;
-
-  --akzent-schrift:   #FFC72C;
-  --akzent-grund:     #3A2E10;
-
-  --erfolg:           #5FD08A;
-  --erfolg-grund:     #14301F;
-  --warnung:          #FFC72C;
-  --warnung-grund:    #3A2E10;
-  --gefahr:           #FF6B5E;
-  --gefahr-grund:     #3D1B18;
-  --material:         #7FB5FF;
-
-  --serie-spur:       #2A2E32;
-}
-
-/* Grundlagen, damit die Tokens sofort tragen. */
-html { color-scheme: light dark; }
-:root[data-theme="nacht"] { color-scheme: dark; }
-:root[data-theme="tag"]   { color-scheme: light; }
-
-body {
-  margin: 0;
-  background: var(--grund);
-  color: var(--schrift);
-  font-family: var(--schrift-text);
-  font-size: var(--groesse-text);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Zahlen stehen spaltenweise untereinander — bei Positionslisten und Summen
-   ist das kein Detail, sondern der Unterschied zwischen lesbar und nicht. */
-.zahl { font-family: var(--schrift-zahl); font-variant-numeric: tabular-nums; }
-
-/* Wer Bewegung reduziert haben will, bekommt keine. */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
