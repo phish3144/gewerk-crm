@@ -131,3 +131,48 @@ inhaltliches Ergebnis**. Diese Aussagen sind damit weder belegt noch widerlegt.
 **Punkt 1 bleibt unveraendert offen.** Nichts aus jenem Lauf darf ohne erneute
 Pruefung ins Datenmodell einfliessen. Das betrifft insbesondere die dort
 genannten Fristen, Prozentsaetze und XRechnung-Feldzuordnungen.
+
+
+---
+
+## Nachtrag 26.08.2026 — Punkt 1 weitgehend geklaert
+
+Der Recherchelauf zum Rechnungsmodell ist beim zweiten Anlauf vollstaendig
+durchgelaufen: **151 Agenten, 0 Fehler, 43 von 48 Aussagen belegt** (beim ersten
+Versuch waren es 10 von 48, der Rest scheiterte am Nutzungslimit).
+
+Ergebnis in [rechnungsmodell.md](rechnungsmodell.md). **Punkt 1 dieser Liste ist
+damit nicht mehr blockierend** — das Schema fuer Abschlagsrechnungen,
+Endrechnung, Einbehalte und Reverse Charge steht auf Paragrafen und amtlichen
+Erlasstexten.
+
+Die wichtigste Einzelantwort auf die urspruengliche Frage: **Der Einbehalt fasst
+den Beleg nie an.** Er ist eine reine Zahlungsmodalitaet und mindert weder
+Bemessungsgrundlage noch Umsatzsteuer (§ 10 Abs. 1 Satz 2 UStG, UStAE 17.1
+Abs. 3a). Ebenso erzeugt Skonto keinen Beleg, und eine unterzahlte
+Abschlagsrechnung keinen Korrekturbeleg.
+
+**Was offen bleibt** (Abschnitt 5 des Dokuments), und warum es das Schema nicht
+blockiert:
+
+1. **EN 16931 hat keine strukturierte Zielstelle fuer die Absetzung je
+   Abschlag.** BT-113 ist ausdruecklich eine einzige Summe, BG-3 traegt keinen
+   Betrag - waehrend das BMF-Schreiben vom 15.10.2025 Rn. 35 alle
+   Pflichtangaben im strukturierten Teil verlangt. Eine kursierende
+   KoSIT/FeRD-Zuordnung ist in der Gegenpruefung durchgefallen und wird bewusst
+   nicht verwendet. Das Datenmodell haelt die Absetzung je Abschlag trotzdem
+   vollstaendig vor, damit jede spaetere Darstellungsform daraus gerendert
+   werden kann. Frage an den Steuerberater.
+2. Rn. 47/48 des BMF-Schreibens vom 15.10.2024 wurden nicht geprueft; zwei
+   Darstellungsvarianten sind bis dahin per CHECK gesperrt - konservativ, aber
+   lockerbar.
+3. ZUGFeRD-Kardinalitaet von `ram:InvoiceReferencedDocument` (Spezifikation nur
+   nach Registrierung abrufbar). Betrifft nur den Serialisierer, nicht das Schema.
+4. Die Prozentsaetze 5 % und 3 % stammen aus der VOB/A, die nicht auf der
+   Quellenliste stand. Deshalb **keine** Default-Prozentsaetze im Schema.
+5. Der Begriff "Werktag" in der VOB/B ist in den geprueften Quellen nicht
+   definiert - ob Samstag zaehlt, bleibt Parameter.
+
+Vier der fuenf verworfenen Aussagen betreffen die EN-16931-Abbildung von
+Einbehalten und Anzahlungen. Die Haeufung ist kein Zufall: die Norm hat dort
+eine Luecke.
