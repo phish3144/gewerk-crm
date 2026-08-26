@@ -169,4 +169,56 @@ begin
   end if;
 end $$;
 
-\echo '  OK  Fremdreferenzen: 12 Wege ueber die Mandantengrenze sind versperrt'
+-- --------------------------------------------------- Deckung der Schluessel ---
+-- Zusammengesetzte Fremdschluessel brauchen einen Index, der mit genau ihren
+-- Spalten in genau ihrer Reihenfolge beginnt. Fehlt er, prueft Postgres jede
+-- Elternaenderung mit einem Seq Scan je Kindtabelle - und betrieb_loeschen()
+-- laeuft ueber alle Kindtabellen auf einmal.
+--
+-- Teilindizes zaehlen hier bewusst nicht als Deckung: sie enthalten nur die
+-- Zeilen ihres Praedikats, die Pruefung fragt aber nach beliebigen. Der
+-- Supabase-Lint ist an dieser Stelle nachsichtiger und meldet drei Schluessel
+-- weniger, als tatsaechlich ungedeckt waren.
+do $$
+declare offen text[] := '{}';
+begin
+  select coalesce(array_agg(c.conrelid::regclass::text || '.' || c.conname order by c.conname), '{}')
+    into offen
+    from pg_constraint c
+   where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+     and not exists (
+       select 1
+         from pg_index i
+         join pg_class ic on ic.oid = i.indexrelid
+        where i.indrelid = c.conrelid
+          and i.indpred is null
+          and ic.relam = (select oid from pg_am where amname = 'btree')
+          and (i.indkey::smallint[])[0:cardinality(c.conkey) - 1] = c.conkey);
+  if array_length(offen, 1) > 0 then
+    raise exception 'FAIL Fremdschluessel ohne deckenden Index: %', array_to_string(offen, ', ');
+  end if;
+end $$;
+
+-- Und keine zwei deckungsgleichen Indizes auf derselben Tabelle.
+do $$
+declare doppelt text[] := '{}';
+begin
+  select coalesce(array_agg(paar order by paar), '{}') into doppelt from (
+    select i1.indrelid::regclass::text || ': ' ||
+           i1.indexrelid::regclass::text || ' = ' || i2.indexrelid::regclass::text as paar
+      from pg_index i1
+      join pg_index i2
+        on i1.indrelid = i2.indrelid
+       and i1.indexrelid < i2.indexrelid
+       and i1.indkey = i2.indkey
+       and i1.indpred is not distinct from i2.indpred
+       and i1.indexprs is not distinct from i2.indexprs
+     where i1.indrelid in (select oid from pg_class
+                            where relnamespace = 'public'::regnamespace and relkind = 'r')
+  ) d;
+  if array_length(doppelt, 1) > 0 then
+    raise exception 'FAIL deckungsgleiche Indizes: %', array_to_string(doppelt, ', ');
+  end if;
+end $$;
+
+\echo '  OK  Fremdreferenzen: 12 Wege versperrt, alle Fremdschluessel gedeckt, keine Doppelindizes'

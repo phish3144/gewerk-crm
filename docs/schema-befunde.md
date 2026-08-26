@@ -2,9 +2,11 @@
 
 Adversariale Pruefung des Datenbankschemas: 43 Rohfunde, **38 nach dreifacher
 Gegenpruefung bestaetigt**, 5 verworfen. Die bestaetigten Funde wurden nicht
-behauptet, sondern in psql reproduziert.
+behauptet, sondern in psql reproduziert. Spaeter kamen **3 weitere aus der
+Rechtevergabe** hinzu (siehe Nachtrag) - die schwerwiegendste Luecke ueberhaupt
+war darunter.
 
-**Stand: alle 38 umgesetzt.** Nachweis: `./supabase/tests/run.sh`
+**Stand: alle 41 umgesetzt.** Nachweis: `./supabase/tests/run.sh`
 
 Der schwerste Fund, mit Beweis vorher/nachher:
 
@@ -126,6 +128,66 @@ Policies, nicht ein fehlendes Recht.
   → 0012 CHECK + 0014 Zukunftsdatum abgewiesen; Test 07
 - **journal.betrieb_id ohne Fremdschluessel: nach dem Loeschen eines Betriebs bleiben unloeschbare, fuer niemanden lesbare Waisenzeilen**
   → 0013 betrieb_loeschen raeumt das Journal mit ab; Test 06
+
+## Nachtrag: drei Funde aus der Rechtevergabe
+
+Die 38 Funde oben stammen aus der Pruefung des Schemas. Beim Abgleich des
+Supabase-Projekts mit dem lokalen Stand kam eine Ebene darunter hinzu: **wer
+ueberhaupt ein Recht auf ein Objekt besitzt.** Alle drei waren lokal unsichtbar,
+weil der Testcluster strenger war als das echte Projekt - Supabase vergibt im
+Schema public per `alter default privileges` automatisch Rechte an `anon` und
+`authenticated`, der lokale Cluster tat das nicht. Der Shim bildet das jetzt
+nach; ohne ihn prueft der Lauf eine Datenbank, die es so nicht gibt.
+
+### kritisch (1)
+
+- **`authenticated` besass TRUNCATE auf allen Tabellen. TRUNCATE unterliegt
+  keiner Zeilenpolicy und feuert keinen Zeilentrigger.**
+  → 0017 Recht entzogen; Test 09 weist es am lebenden Objekt nach
+
+  ```
+  VORHER  Anna sieht genau 1 von 2 Belegen (RLS wirkt)
+          DELETE FROM beleg            ->  1 Zeile, ihre eigene. Richtig.
+          TRUNCATE beleg CASCADE       ->  0 Belege uebrig, in ALLEN Betrieben,
+                                           dazu beleg_position, zahlung,
+                                           beleg_anrechnung, einbehalt_position
+                                           und zeiteintrag. Festgeschriebene
+                                           Rechnungen eingeschlossen.
+  NACHHER TRUNCATE beleg CASCADE       ->  permission denied, 2 Belege uebrig
+  ```
+
+### hoch (2)
+
+- **`naechste_nummer` war fuer `anon` und `authenticated` direkt aufrufbar.**
+  0009 hatte das Recht nur PUBLIC entzogen, das Standardrecht der Rolle blieb.
+  Die Funktion ist security definer ohne Zugehoerigkeitspruefung - jeder direkte
+  Aufruf verbrennt eine Nummer im Kreis eines beliebigen fremden Betriebs und
+  reisst genau die Luecke, gegen die 0009 angetreten war.
+  → 0017 kein Ausfuehrungsrecht mehr; erreichbar nur ueber `beleg_festschreiben`
+
+  Bemerkenswert: die Zusicherung dafuer stand seit 0009 in Test 04 und war
+  gruen. Sie war gruen, weil lokal das Recht fehlte, das in Produktion da war.
+
+- **`anon` besass `arwdDxtm` auf allen 20 Tabellen, auch auf `journal` und
+  `nummernkreis`.** Getragen hat allein RLS. Eine einzige Policy, die `to public`
+  statt `to authenticated` schreibt, und die Daten liegen unter dem
+  oeffentlichen anon-Schluessel offen.
+  → 0017 `anon` besitzt kein Recht auf kein Objekt mehr
+
+  Der erste Entzug reichte nicht: der Postgres-Standard fuer Funktionen ist
+  EXECUTE fuer PUBLIC, und PUBLIC schliesst anon ein. Test 09 hat den
+  unvollstaendigen Entzug gefunden - 13 Funktionen standen weiter offen.
+
+### dazu, ohne Sicherheitsbezug
+
+23 zusammengesetzte Fremdschluessel ohne deckenden Index - eine Folge der
+Umstellung auf `(betrieb_id, id)` in 0008, die jeden vorhandenen Index auf der
+Kindspalte entwertet hat. Betroffen ist vor allem `betrieb_loeschen()`, das die
+Kaskade durch saemtliche Fachtabellen laufen laesst.
+→ 0018; Test 03 prueft die Deckung ab jetzt mit
+
+Der Supabase-Lint meldete 20 davon. Die drei fehlenden waren nur von Teilindizes
+beruehrt, und ein Teilindex deckt nur die Zeilen seines Praedikats.
 
 ## Verworfen
 

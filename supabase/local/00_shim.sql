@@ -22,3 +22,17 @@ end $$;
 
 grant usage on schema public to anon, authenticated, service_role;
 grant usage on schema auth to anon, authenticated, service_role;
+
+-- Supabase vergibt im Schema public Standardrechte (alter default privileges,
+-- erteilt von der Rolle postgres, unter der auch die Migrationen laufen). Jede
+-- neu angelegte Tabelle und jede neue Funktion bekommt dadurch automatisch
+-- Rechte fuer anon und authenticated - einschliesslich TRUNCATE und EXECUTE.
+--
+-- Ohne diese Zeilen testet der lokale Lauf eine Datenbank, die strenger ist als
+-- die echte: es fehlt schlicht das Recht, das in Produktion vorhanden ist. Genau
+-- daran ist der erste Durchgang vorbeigelaufen. Die Werte sind 1:1 aus
+-- pg_default_acl des Projekts uebernommen.
+alter default privileges in schema public grant all on tables    to anon, authenticated, service_role;
+alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+alter default privileges in schema public
+  grant usage, select, update on sequences to anon, authenticated, service_role;
