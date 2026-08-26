@@ -54,6 +54,51 @@ Index kostet das Kontingent überproportional, und DDL zählt auf beide Kontinge
 Baustellenfotos werden häufig wiederholt mobil abgerufen — Egress ist der
 Kostentreiber, nicht Storage. Bei R2 ist er strukturell null.
 
+### EU-Jurisdiktion: einmalig und unumkehrbar
+
+R2 kennt zwei verschiedene Dinge, die leicht verwechselt werden:
+
+| | Was es zusichert |
+|---|---|
+| **Location Hint** (`weur`) | Cloudflare bemüht sich um Platzierung in Westeuropa. Keine Zusicherung. |
+| **Jurisdiction** (`eu`) | Die Daten werden in der EU **gespeichert und verarbeitet**. Das ist die Zusicherung, die man einem Kunden nennen kann. |
+
+Für uns gilt **Jurisdiction `eu`**, nicht der Hint. Datenschutz ist eines der
+drei Verkaufsargumente, und 96 % der Betriebe nennen ihn als Hemmnis.
+
+> **Die Jurisdiktion lässt sich nach dem Anlegen nicht mehr ändern.** Ein
+> versehentlich ohne Jurisdiktion angelegter Bucket ist nur durch Löschen und
+> Neuanlegen zu korrigieren.
+
+Der Cloudflare-MCP-Connector kann das **nicht**: sein `r2_bucket_create` kennt
+nur einen Namen und keine Jurisdiktion. Ein darüber angelegter Bucket landet
+dauerhaft ohne EU-Bindung. Zwei Wege, die es können:
+
+```bash
+# Dashboard: R2 → Create bucket → Location → "Specify jurisdiction" → EU
+# oder:
+wrangler r2 bucket create gewerk-crm-dokumente -J eu --location weur
+```
+
+**Folgen für den Anwendungscode** — beides ist beim ersten Zugriff sonst ein
+Rätsel:
+
+- Die Worker-Bindung braucht die Jurisdiktion, nicht nur den Namen:
+  ```toml
+  [[r2_buckets]]
+  binding = "DOKUMENTE"
+  bucket_name = "gewerk-crm-dokumente"
+  jurisdiction = "eu"
+  ```
+- Über die S3-API gilt ein eigener Endpunkt:
+  `https://<account_id>.eu.r2.cloudflarestorage.com`. Ein Aufruf gegen den
+  normalen Endpunkt findet den Bucket nicht.
+- Auch beim Auflisten und in den Metriken taucht er nur mit Jurisdiktionsangabe
+  auf (in der Metrik als `eu_gewerk-crm-dokumente`). Ein leeres Ergebnis ohne
+  Jurisdiktionsangabe heißt also nicht, dass der Bucket fehlt.
+- Logpush arbeitet nicht mit Buckets, die einer Jurisdiktion zugeordnet sind.
+  Für uns ohne Belang, aber gut zu wissen, bevor jemand es versucht.
+
 ---
 
 ## Offline-Konzept

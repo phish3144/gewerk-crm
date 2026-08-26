@@ -192,9 +192,12 @@ verhungert. Der Knopf muss **genauso leicht** erreichbar sein.
 - Kein öffentlich lesbarer Bucket; eine URL ohne Signatur liefert 403
 - `erfasst_am` kommt vom Gerät, `hochgeladen_am` vom Server — beide sichtbar, wenn sie auseinanderliegen
 
-> **Vorbereitung nötig:** R2 ist im Cloudflare-Konto noch nicht freigeschaltet
-> (Fehler 10042 beim Anlegen des Buckets). Das muss im Dashboard einmal
-> aktiviert werden — am besten jetzt, damit es Schritt 5 nicht aufhält.
+> **Vorbereitung:** R2 ist freigeschaltet (26.08.2026) — die Bucket-Liste
+> antwortet, kein Fehler 10042 mehr. Der Bucket selbst wird im Dashboard **mit
+> Jurisdiktion EU** angelegt; der MCP-Connector kann das nicht, und die
+> Jurisdiktion ist nach dem Anlegen unveränderlich. Bindung und S3-Endpunkt
+> tragen sie dann ebenfalls — siehe [architektur.md](architektur.md),
+> „EU-Jurisdiktion: einmalig und unumkehrbar".
 
 ---
 
@@ -337,7 +340,8 @@ genau das, was sonst niemand tut.
 
 ## Offene Punkte
 
-1. **R2 freischalten** (Cloudflare-Dashboard, Fehler 10042) — blockiert Schritt 5.
+1. ~~R2 freischalten~~ — erledigt am 26.08.2026. Offen ist nur noch der Bucket
+   selbst, anzulegen mit **Jurisdiktion EU**.
 2. **Verrechnungssatz je Mitarbeiter** fehlt im Modell. Für den Eurobetrag in
    Schritt 6 nötig. Kleine Ergänzung an `mitarbeiter`, kommt in 0019 mit.
 3. **Kein Artboard für „Ungeklärt"** — die wichtigste Ansicht der App hat noch
