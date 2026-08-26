@@ -25,6 +25,23 @@ test.beforeEach(() => {
 // gegenseitig sehen. Die Zeit kommt aus dem Prozess, nicht aus der Datenbank.
 const LAUF = String(process.env["PRUEF_LAUF"] ?? Date.now());
 
+// Next haengt fuer Routenansagen ein eigenes role="alert" in jede Seite. Ein
+// pauschales getByRole("alert") trifft deshalb zwei Elemente. Diese beiden
+// Helfer zielen genau auf unsere eigenen Meldungen — und pruefen dabei mehr als
+// vorher: dass der Fehler ueber aria-describedby wirklich am Feld haengt und
+// das Feld als fehlerhaft ausgezeichnet ist. Ein Fehler, der nur danebensteht,
+// erreicht niemanden, der die Seite vorlesen laesst.
+async function feldFehler(page: Page, feld: string) {
+  const eingabe = page.locator(`#${feld}`);
+  await expect(eingabe).toHaveAttribute("aria-invalid", "true");
+  await expect(eingabe).toHaveAttribute("aria-describedby", new RegExp(`${feld}-fehler`));
+  return page.locator(`#${feld}-fehler`);
+}
+
+function meldung(page: Page) {
+  return page.locator(".hinweis[role='alert']");
+}
+
 async function anmelden(page: Page, konto: (typeof KONTEN)[keyof typeof KONTEN]) {
   await page.goto("/anmelden");
   await page.getByLabel("E-Mail").fill(konto.email);
@@ -72,10 +89,10 @@ test.describe("Kunden", () => {
       await page.getByRole("button", { name: "Kunde anlegen" }).click();
 
       if (durchgang === 2) {
-        const meldung = page.getByRole("alert");
-        await expect(meldung).toContainText("Kundennummer");
+        const fehler = await feldFehler(page, "nummer");
+        await expect(fehler).toContainText("Kundennummer");
         // Kein Datenbankjargon in der Oberflaeche.
-        await expect(meldung).not.toContainText(/constraint|duplicate|violates|key/i);
+        await expect(fehler).not.toContainText(/constraint|duplicate|violates|key/i);
       }
     }
   });
@@ -85,12 +102,13 @@ test.describe("Kunden", () => {
     await page.goto("/kunden/neu");
     await page.getByLabel("Name").fill(`Skontokunde ${LAUF}`);
     // Die Browser-Pruefung umgehen, damit die Server-Regel wirklich laeuft.
-    await page.getByLabel("Skonto").evaluate((el: HTMLInputElement) => {
+    await page.getByLabel("Skonto", { exact: true }).evaluate((el: HTMLInputElement) => {
       el.removeAttribute("max");
       el.value = "150";
     });
     await page.getByRole("button", { name: "Kunde anlegen" }).click();
-    await expect(page.getByRole("alert")).toContainText("zwischen 0 und unter 100");
+    const fehler = await feldFehler(page, "skonto_prozent");
+    await expect(fehler).toContainText("zwischen 0 und unter 100");
   });
 });
 
@@ -124,7 +142,8 @@ test.describe("Projekte", () => {
     await page.getByLabel("Beginn").fill("2026-09-01");
     await page.getByLabel("Ende").fill("2026-08-01");
     await page.getByRole("button", { name: "Projekt anlegen" }).click();
-    await expect(page.getByRole("alert")).toContainText("nicht vor dem Beginn");
+    const fehler = await feldFehler(page, "ende");
+    await expect(fehler).toContainText("nicht vor dem Beginn");
   });
 });
 
@@ -139,15 +158,11 @@ test.describe("Mandantentrennung durch die Oberflaeche", () => {
     await expect(page.getByRole("heading", { name })).toBeVisible();
     const adresse = new URL(page.url()).pathname;
 
-    // B meldet sich an und ruft genau diese Adresse auf.
-    await page.goto("/abmelden");
-    await page.evaluate(() => {
-      const f = document.createElement("form");
-      f.method = "post";
-      f.action = "/abmelden";
-      document.body.append(f);
-      f.submit();
-    });
+    // Abmelden ueber den Knopf in der Kopfzeile, also den Weg, den auch eine
+    // Nutzerin nimmt. Ein GET auf /abmelden waere kein gueltiger Weg: die Route
+    // beantwortet absichtlich nur POST, damit sie sich nicht von fremder Seite
+    // aus ausloesen laesst.
+    await page.getByRole("button", { name: "Abmelden" }).click();
     await page.waitForURL(/\/anmelden/);
 
     await anmelden(page, KONTEN.b);

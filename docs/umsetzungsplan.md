@@ -143,7 +143,7 @@ Projekt an und gehört deshalb dem Betreiber, nicht dem Prüflauf.
 
 ---
 
-### Schritt 2 — Kunden und Projekte
+### Schritt 2 — Kunden und Projekte ✓ erledigt
 
 **Ziel:** Das Bedienmuster einmal richtig bauen, an der einfachsten Stelle.
 
@@ -159,6 +159,13 @@ Projekt an und gehört deshalb dem Betreiber, nicht dem Prüflauf.
 
 **Fallstrick:** Hier entsteht das Vokabular für alles Weitere. Zwei Tage mehr an
 dieser Stelle sparen zwei Wochen später.
+
+**Abgenommen am 27.08.2026:** 12 Oberflächentests grün, davon 7 mit echter
+Anmeldung gegen das Projekt. Zwei davon belegen die Mandantentrennung **durch
+die Oberfläche**: ein fremder Kunde liefert 404, und B sieht die Kunden von A
+nicht in der Liste. Die Prüfkonten `pruefer-a@example.com` und
+`pruefer-b@example.com` gehören zur Testeinrichtung und legen sich selbst an;
+angelegte Datensätze räumen die Tests über die Anwendungsrolle wieder ab.
 
 ---
 
