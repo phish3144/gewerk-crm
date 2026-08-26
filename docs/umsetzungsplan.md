@@ -1,0 +1,355 @@
+# Umsetzungsplan der Anwendung
+
+Neun Schritte von „keine Zeile Anwendungscode" bis zur benutzbaren App, mit dem
+Nachtragswächter als tragendem Teil — nicht als Nachrüstung.
+
+Jeder Schritt hat **Fertig wenn** — überprüfbare Bedingungen, keine
+Absichtserklärungen. Ein Schritt gilt erst als erledigt, wenn alle erfüllt sind.
+
+---
+
+## Ausgangslage
+
+**Fertig und geprüft:** 18 Migrationen, 20 Tabellen, 9 Testdateien grün.
+Mandantentrennung auf Fremdschlüsselebene, GoBD-Festschreibung,
+Rechnungsmodell mit Abschlagsabsetzung, Rechtevergabe gehärtet. Design-Tokens
+für Tag und Nacht, 9 Ansichten als Artboards.
+
+**Nicht vorhanden:** jede Zeile Anwendungscode.
+
+**Entscheidungen aus [architektur.md](architektur.md)**, hier nicht neu
+verhandelt: Next.js App Router als PWA, Cloudflare Pages + Workers via OpenNext,
+Supabase Postgres in `eu-central-1`, Fotos nach R2, Offline als Write-Queue mit
+client-erzeugten UUIDs.
+
+**Vier Entscheidungen zum Wächter**, in diesem Durchgang getroffen:
+
+| Frage | Entscheidung |
+|---|---|
+| Buchung ohne Position | **melden und Nachweis verlangen** — Buchung geht durch, Foto oder Notiz ist Pflicht |
+| Umfang | **Zeit + Material + Mengenmehrung** über 110 % |
+| Bedenkenanzeige | **erzeugen, Versand durch den Betrieb** — kein Mailversand durch uns |
+| Anmeldung | **Passwort mit langer Sitzung**, kein Magic Link |
+
+---
+
+## Was im Datenmodell noch fehlt
+
+Beim Durchplanen sind drei echte Lücken aufgefallen — keine davon war vorher
+sichtbar.
+
+### 1. Es gibt keine Materialerfassung
+
+`artikel` sind Stammdaten, `beleg_position` ist das *Angebotene*. Was auf der
+Baustelle **tatsächlich verbraucht** wird, erfasst bisher nichts. „Material ohne
+Position" lässt sich also gar nicht feststellen — die Tabelle dafür existiert
+nicht.
+
+→ **Migration 0019:** neue Tabelle `materialentnahme`, gebaut wie `zeiteintrag`:
+client-erzeugte `id` (idempotenter Offline-Upload), `projekt_id`,
+`artikel_id` (nullable, freie Eingabe erlaubt), `bezeichnung`, `menge`,
+`einheit`, **`position_id` nullable** — genau das Signal, das den Wächter
+auslöst.
+
+### 2. Ein Nachtrag ist keine Belegart
+
+`beleg_art` kennt Angebot, Auftrag, die drei Rechnungsarten, Gutschrift und
+Storno. Ein Nachtrag ist fachlich ein Angebot mit Bezug auf einen bestehenden
+Auftrag und gehört als eigene Art hinein — sonst ist er in der Auswertung nicht
+von einem normalen Angebot zu trennen.
+
+→ **Migration 0019:** `nachtrag` in `beleg_art`, Präfix `NA-` in
+`nummer_praefix()`. Der Bezug zum Hauptauftrag läuft über das vorhandene
+`vorgaenger_id`.
+
+### 3. Die Bedenkenanzeige hat keinen Ort
+
+§ 4 Abs. 3 VOB/B verlangt **unverzüglich und schriftlich**. Ein Beweis, der als
+Notiz in einem Textfeld liegt, ist keiner.
+
+→ **Migration 0020:** Tabelle `bedenkenanzeige` mit `erstellt_am`,
+`versendet_am`, `versandart`, `empfaenger`, Bezug auf Projekt und auslösende
+Buchung — und einem Trigger, der sie **ab dem Versand unveränderlich** macht,
+nach demselben Muster wie `beleg_unveraenderlich()`.
+
+> **Achtung, Folge aus 0017:** seit der Rechtehärtung erben neue Tabellen
+> **keine** Rechte mehr. Jede dieser Migrationen muss `grant select, insert,
+> update, delete ... to authenticated` selbst mitbringen, sonst ist die Tabelle
+> für die Anwendung unsichtbar. Test 09 fängt das Gegenteil ab (zu viele
+> Rechte), nicht den Fall „vergessen" — deshalb hier ausdrücklich notiert.
+
+---
+
+## Die neun Schritte
+
+### Anlauf: 1 bis 5
+
+Der Wächter braucht ein Leistungsverzeichnis, eine Buchung und einen
+Nachweiskanal. Diese fünf Schritte sind kein Vorspiel, sondern seine
+Voraussetzung.
+
+---
+
+### Schritt 1 — Gerüst und Anmeldung
+
+**Ziel:** Eine angemeldete Person sieht ihren Betrieb und sonst nichts.
+
+**Inhalt**
+- Next.js App Router, OpenNext, Deploy auf Cloudflare Pages + Workers
+- Supabase Auth mit Passwort, lange Sitzung, Sitzung überlebt Appneustart
+- `tokens.css` und `basis.css` eingebunden, Tag/Nacht folgt dem Gerät, manuell umschaltbar
+- Betriebsauswahl, wenn jemand zu mehreren gehört (das Modell erlaubt es)
+- Navigation je Rolle: Monteur sieht Zeit und Doku, Büro zusätzlich Belege, Inhaber alles
+
+**Fertig wenn**
+- Anmelden, abmelden, Neuladen hält die Sitzung
+- Ein E2E-Test meldet zwei Nutzer aus verschiedenen Betrieben an und belegt, dass keiner Daten des anderen sieht
+- Ein Test schlägt fehl, sobald `SUPABASE_SERVICE_ROLE_KEY` im Client-Bundle auftaucht
+- Deploy läuft aus dem Repo, die Seite ist über eine URL erreichbar
+
+**Fallstrick:** Der `service_role`-Schlüssel darf nie in den Client. Die gesamte
+Mandantentrennung hängt daran, dass jeder Zugriff als `authenticated` läuft und
+damit durch RLS. Deshalb ist das ein Test, keine Konvention.
+
+---
+
+### Schritt 2 — Kunden und Projekte
+
+**Ziel:** Das Bedienmuster einmal richtig bauen, an der einfachsten Stelle.
+
+**Inhalt**
+- Liste, Detail, Anlegen, Ändern für `kunde` und `projekt`
+- Das wiederverwendbare Muster: Ladezustand, Leerzustand, Fehlerzustand, Speicherzustand
+- Suche über Name und Nummer
+
+**Fertig wenn**
+- Kunde und Projekt anlegen, ändern, in der Liste finden
+- Ein Formularfehler aus der Datenbank (z. B. doppelte Kundennummer) erscheint verständlich am Feld, nicht als roter Kasten mit SQL-Text
+- Das Muster liegt in Komponenten, die Schritt 3 bis 9 benutzen
+
+**Fallstrick:** Hier entsteht das Vokabular für alles Weitere. Zwei Tage mehr an
+dieser Stelle sparen zwei Wochen später.
+
+---
+
+### Schritt 3 — Angebot und Auftrag mit Positionen
+
+**Ziel:** Das Leistungsverzeichnis entsteht. **Ohne diesen Schritt gibt es
+nichts, wogegen der Wächter prüfen könnte.**
+
+**Inhalt**
+- Positionen erfassen: Leistung, Material, Text, Titel; Menge, Einheit, Einzelpreis
+- Kalkulationsanteile je Einheit (Lohn, Material, Fremdleistung, Lohnminuten) — die Grundlage jeder späteren Nachkalkulation
+- Angebot in Auftrag wandeln
+- Festschreiben über `beleg_festschreiben()`, danach zeigt die Oberfläche den Beleg als gesperrt
+
+**Fertig wenn**
+- Angebot mit mindestens 10 Positionen inkl. Titelzeilen erfassbar
+- Festschreiben vergibt `AN-2026-00001`; ein zweites Festschreiben desselben Belegs wird abgewiesen und die Meldung ist verständlich
+- Nach dem Festschreiben ist keine Position mehr änderbar — die Oberfläche bietet es gar nicht erst an
+- Summen im Client stimmen mit `beleg.netto/steuer/brutto` überein (kaufmännisch je Position gerundet, dann summiert)
+
+**Fallstrick:** Die Summen dürfen **nicht** im Client gerechnet und gespeichert
+werden. Die Datenbank rechnet, der Client zeigt. Weicht der Client ab, ist der
+Client falsch.
+
+---
+
+### Schritt 4 — Zeiterfassung mit Positionsbezug
+
+**Ziel:** Der Erfassungspunkt, an dem der Wächter später ansetzt.
+
+**Inhalt**
+- Monteursansicht: Projekt wählen → Position wählen → starten/stoppen
+- **„Keine passende Position"** ist ein gleichwertiger, sichtbarer Knopf neben der Positionsliste — kein versteckter Notausgang. Wer ihn drückt, hat nichts falsch gemacht; er meldet nur, dass das LV die Arbeit nicht abdeckt
+- Offline-Warteschlange in IndexedDB, client-erzeugte UUIDs, Statusanzeige („3 Einträge warten")
+- Nacherfassung für vergangene Tage (§ 17 MiLoG erlaubt 7 Tage)
+
+**Fertig wenn**
+- Zeit im Flugmodus erfassen, Netz einschalten, Eintrag erscheint serverseitig
+- Derselbe Eintrag zweimal gesendet erzeugt **einen** Datensatz (client-UUID als Primärschlüssel)
+- App schließen und neu öffnen verliert keinen Eintrag aus der Warteschlange
+- Der Weg „Projekt → Position → läuft" braucht höchstens drei Berührungen
+
+**Fallstrick:** Wird „keine passende Position" umständlicher gestaltet als die
+Positionsauswahl, wählen die Monteure irgendeine Position — und der Wächter
+verhungert. Der Knopf muss **genauso leicht** erreichbar sein.
+
+---
+
+### Schritt 5 — Fotos, Notizen, R2
+
+**Ziel:** Der Nachweiskanal. Ohne ihn kann Schritt 6 keinen Nachweis verlangen.
+
+**Inhalt**
+- Foto aufnehmen, clientseitig auf ~500 KB komprimieren, in die Warteschlange
+- Upload nach R2 über kurzlebige, signierte URLs; in der Datenbank steht nur der Objektschlüssel
+- Notiz und Aufmaß je Projekt
+- Anzeige im Projekt, chronologisch
+
+**Fertig wenn**
+- Foto offline aufnehmen, später hochladen, im Projekt sichtbar
+- Kein öffentlich lesbarer Bucket; eine URL ohne Signatur liefert 403
+- `erfasst_am` kommt vom Gerät, `hochgeladen_am` vom Server — beide sichtbar, wenn sie auseinanderliegen
+
+> **Vorbereitung nötig:** R2 ist im Cloudflare-Konto noch nicht freigeschaltet
+> (Fehler 10042 beim Anlegen des Buckets). Das muss im Dashboard einmal
+> aktiviert werden — am besten jetzt, damit es Schritt 5 nicht aufhält.
+
+---
+
+### Der Wächter: 6 und 7
+
+---
+
+### Schritt 6 — Nachtragswächter, Teil 1: Erkennen
+
+**Ziel:** Der Betrieb erfährt **am selben Tag**, dass jemand etwas gemacht hat,
+das nicht beauftragt ist.
+
+**Inhalt**
+
+*Migrationen 0019 und 0020* wie oben beschrieben.
+
+*Drei Regeln:*
+
+| # | Regel | Grundlage |
+|---|---|---|
+| 1 | Zeitbuchung ohne `position_id` | keine — schlicht nicht beauftragt |
+| 2 | Materialentnahme ohne `position_id` | dito |
+| 3 | Ist-Menge über **110 %** der Soll-Menge | § 2 Abs. 3 Nr. 2 VOB/B |
+
+*Nachweispflicht:* Wer „keine passende Position" wählt, muss ein Foto oder eine
+Notiz mitgeben, bevor die Buchung in die Warteschlange geht. Auf der Baustelle
+kostet das zehn Sekunden; vier Wochen später ist es nicht mehr zu beschaffen.
+
+*Büroansicht „Ungeklärt":* eine Liste, nach Projekt gruppiert, mit Betrag in
+Euro (Stunden × Verrechnungssatz, Material × Einkaufspreis). Nicht „7 Meldungen",
+sondern **„1.240 € nicht beauftragt"**. Die Zahl ist die Botschaft.
+
+**Fertig wenn**
+- Alle drei Regeln haben einen Datenbanktest in `supabase/tests/`, der sie an echten Zeilen belegt
+- Eine Buchung ohne Position lässt sich **nicht** ohne Foto oder Notiz abschließen
+- Die Büroansicht zeigt eine heute erfasste Buchung noch heute
+- Der Eurobetrag stimmt mit einer Handrechnung überein
+
+**Ehrliche Grenze bei Regel 3.** Die 110-%-Prüfung funktioniert nur, wo die
+Einheiten vergleichbar sind:
+
+- Materialposition in Stk/m/kg gegen `materialentnahme.menge` → **vergleichbar**
+- Lohnposition in Stunden gegen erfasste Zeit → **vergleichbar**
+- Position in m² oder m³ („Wand verputzen, 120 m²") → **nicht ableitbar.** Aus
+  Stunden folgt keine Fläche.
+
+Für diese Positionen braucht es einen von Hand gepflegten Leistungsstand. Der
+kommt **nicht** in Schritt 6 — er ist ohnehin die Grundlage der
+Abschlagsautomatik nach § 632a BGB und gehört dorthin. Regel 3 läuft also
+zunächst nur, wo die Einheit passt, und sagt das in der Oberfläche auch.
+
+**Fallstrick:** Zu viele Meldungen sind so schlecht wie keine. Deshalb
+Euro-Schwelle statt Zählung, Gruppierung je Projekt, und ein Weg, eine Meldung
+mit Begründung als „geklärt" abzulegen — die Begründung landet im Journal.
+
+---
+
+### Schritt 7 — Nachtragswächter, Teil 2: Handeln
+
+**Ziel:** Von der Meldung zum abrechenbaren Nachtrag in unter zwei Minuten.
+
+**Inhalt**
+- Aus einer oder mehreren ungeklärten Buchungen einen **Nachtrag** erzeugen: Positionen entstehen aus den Ist-Mengen, die Beweisfotos hängen dran, der Bezug auf den Hauptauftrag steht in `vorgaenger_id`
+- **Bedenkenanzeige § 4 Abs. 3 VOB/B** als PDF: Bezug, Datum, Sachverhalt, Fotos, Unterschriftsfeld
+- Versand durch den Betrieb; die App hakt „versendet am / wie / an wen" ab und friert den Datensatz damit ein
+- Die betroffenen Buchungen wechseln von „ungeklärt" auf „im Nachtrag NA-2026-00003"
+
+**Fertig wenn**
+- Meldung → Nachtrag → festgeschrieben → PDF in unter zwei Minuten, an echten Daten gemessen
+- Ein versendeter Nachweis ist nicht mehr änderbar (Datenbanktest, nicht nur UI)
+- Der Nachtrag taucht in der Schlussrechnung auf und wird korrekt abgesetzt — das prüft der vorhandene Absetzungs-Trigger bereits
+
+**Fallstrick:** Ab 110 % ist laut BGH nicht mehr die ursprüngliche
+Preisermittlung maßgeblich, sondern die **tatsächlich erforderlichen Kosten** der
+Mehrmenge. Die App darf den alten Einheitspreis also nicht stillschweigend
+fortschreiben — sie muss zur Eingabe der tatsächlichen Kosten auffordern und
+kenntlich machen, warum.
+
+---
+
+### Ausbau: 8 und 9
+
+---
+
+### Schritt 8 — Rechnung, PDF, E-Rechnung
+
+**Ziel:** Geld anfordern, rechtssicher.
+
+**Inhalt**
+- Abschlags-, Teil- und Schlussrechnung aus dem Auftrag; Anrechnung der Abschläge
+- PDF-Visualisierung und ZUGFeRD 2.0.1 BASIC aus **denselben** Daten
+- Zahlungen erfassen, Zahlungsstand je Beleg
+
+**Fertig wenn**
+- Schlussrechnung mit zwei Abschlägen: Absetzung stimmt, § 14c-Trigger greift bei Fehlversuch
+- Die erzeugte XML besteht einen externen Validator (manuell, der Java-Validator bleibt vertagt)
+- PDF und XML weichen inhaltlich nicht voneinander ab — gleiche Quelle, ein Test vergleicht sie
+
+---
+
+### Schritt 9 — Übersicht und Fristen
+
+**Ziel:** Der Inhaber sieht morgens, was Geld kostet.
+
+**Inhalt**
+- Dashboard: nicht beauftragte Leistung in Euro, offene Posten, Zahlungsstand
+- Fristenwächter: Gewährleistung, Freistellungsbescheinigung, Sicherheitseinbehalt, Skonto
+- Nachkalkulation je Projekt: geplant gegen tatsächlich
+
+**Fertig wenn**
+- Jede Kennzahl ist bis auf die einzelne Zeile aufklappbar
+- Keine Zahl ohne Herkunft
+
+---
+
+## Warum diese Reihenfolge
+
+Der Wächter steht an Position 6, obwohl er das Wichtigste ist. Das ist kein
+Zurückstellen, sondern seine Abhängigkeit: Er braucht ein Leistungsverzeichnis
+(3), eine Buchung mit Positionsbezug (4) und einen Nachweiskanal (5). Vorher
+lässt er sich nicht bauen, nur behaupten.
+
+Nach Schritt 7 ist die App **verkaufbar**, auch ohne 8 und 9 — sie tut dann
+genau das, was sonst niemand tut.
+
+---
+
+## Was bewusst draußen bleibt
+
+| | Warum |
+|---|---|
+| Abschlagsautomatik § 632a BGB | Braucht den händischen Leistungsstand aus Schritt 6/9. Direkt danach der nächste große Hebel. |
+| Eingangsrechnungen | Wertvoll und billig, aber kein Alleinstellungsmerkmal. Nach Schritt 8. |
+| Open Masterdata / Datanorm | Integrationsarbeit mit vielen Partnern. Späterer Burggraben. |
+| GAEB-Import | Haben alle Wettbewerber. Nötig für öffentliche Aufträge, kein Vorsprung. |
+| Disposition, Material-Lagerverwaltung | Artboards existieren, Nutzen ist gegenüber dem Wächter gering. |
+| DATEV-Export | Erst wenn ein echter Betrieb einen Steuerberater mitbringt. |
+
+---
+
+## Offene Punkte
+
+1. **R2 freischalten** (Cloudflare-Dashboard, Fehler 10042) — blockiert Schritt 5.
+2. **Verrechnungssatz je Mitarbeiter** fehlt im Modell. Für den Eurobetrag in
+   Schritt 6 nötig. Kleine Ergänzung an `mitarbeiter`, kommt in 0019 mit.
+3. **Kein Artboard für „Ungeklärt"** — die wichtigste Ansicht der App hat noch
+   kein Bild. Sollte vor Schritt 6 entworfen werden.
+4. **Steuerberater** vor den ersten echten Rechnungen; Fragenliste liegt in
+   [rechnungsmodell.md](rechnungsmodell.md), Abschnitt 4.
+
+---
+
+## Quellen
+
+- [§ 2 Abs. 3 Nr. 2 VOB/B — Vergütungsanpassung bei Mengenmehrungen](https://www.anwalt.de/rechtstipps/verguetungsanpassung-bei-mengenmehrungen-gemaess-2-abs-3-nr-2-vobb_160432.html)
+- [BGH: bei Mehrmengen sind die tatsächlich erforderlichen Kosten maßgeblich](https://www.vob-online.de/de/bei-mehrmengen-i-s-v-2-abs-3-nr-2-vob-b-sind-die-tatsaechlich-erforderlichen-kosten-zuzueglich-angemessener-zuschlaege-massgeblich-719122)
+- [Nachträge im Bauvertrag: § 2 VOB/B richtig anwenden](https://vergabescanner.de/blog/nachtraege-vob-b-paragraph-2/)
+- [Aufzeichnungspflicht nach § 17 MiLoG](https://www.avetiq.de/ratgeber/aufzeichnungspflicht-milog/)
