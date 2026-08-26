@@ -172,6 +172,12 @@ blockiert:
    Quellenliste stand. Deshalb **keine** Default-Prozentsaetze im Schema.
 5. Der Begriff "Werktag" in der VOB/B ist in den geprueften Quellen nicht
    definiert - ob Samstag zaehlt, bleibt Parameter.
+6. **`lieferant` hat weder Nummer noch Anschrift.** Die Tabelle beschreibt
+   bisher nur die Anbindung an den Grosshandel (IDS-Version und -Endpunkt) und
+   ob jemand zusaetzlich als Subunternehmer einplanbar ist. Fuer eine Bestellung
+   fehlen Anschrift, Kundennummer beim Lieferanten und Ansprechpartner. Beim
+   Anlegen der Demodaten aufgefallen. Nachzuholen, sobald der Materialteil
+   (Schritt in der Roadmap) drankommt - vorher waeren es Felder ohne Verwender.
 
 Vier der fuenf verworfenen Aussagen betreffen die EN-16931-Abbildung von
 Einbehalten und Anzahlungen. Die Haeufung ist kein Zufall: die Norm hat dort
