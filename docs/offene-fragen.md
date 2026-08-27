@@ -179,6 +179,16 @@ blockiert:
    Anlegen der Demodaten aufgefallen. Nachzuholen, sobald der Materialteil
    (Schritt in der Roadmap) drankommt - vorher waeren es Felder ohne Verwender.
 
+7. **Eine Baustelle mit belegten, nicht beauftragten Buchungen laesst sich
+   nicht loeschen.** Seit 0021 steht auf `nachweis_id` ein RESTRICT, und
+   `dokumentation` haengt per CASCADE am Projekt: der Loeschversuch bricht ab,
+   weil eine Zeitbuchung ihren Nachweis noch braucht. Fachlich ist das
+   vertretbar - erst klaeren, dann loeschen -, aber die Meldung nennt die
+   falsche Tabelle. Heute nur theoretisch: die Anwendung bietet kein Loeschen
+   von Projekten an. Wenn sie es tut, muss der Weg lauten "erst die offenen
+   Meldungen klaeren", mit genau diesem Satz. Beim Aufraeumen der Pruefdaten
+   aufgefallen.
+
 Vier der fuenf verworfenen Aussagen betreffen die EN-16931-Abbildung von
 Einbehalten und Anzahlungen. Die Haeufung ist kein Zufall: die Norm hat dort
 eine Luecke.

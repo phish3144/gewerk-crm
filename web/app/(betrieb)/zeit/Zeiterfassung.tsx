@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { anstellen } from "@/lib/warteschlange";
-import { Warteschlange, warteschlangeGeaendert } from "@/komponenten/Warteschlange";
+import { nachweisAnstellen, nachweisReicht } from "@/lib/nachweis";
+import { Nachweis, LEERER_NACHWEIS, type NachweisStand } from "@/komponenten/Nachweis";
+import { warteschlangeGeaendert } from "@/komponenten/Warteschlange";
 
 type Position = { id: string; nr: number; text: string; einheit: string };
 type Projekt = { id: string; text: string; positionen: Position[] };
@@ -31,8 +33,21 @@ export function Zeiterfassung({
     setzeLaeuft({ beginn: new Date().toISOString(), position: positionId });
   }
 
-  async function stoppen(taetigkeit: string) {
+  async function stoppen(taetigkeit: string, nachweis: NachweisStand) {
     if (!laeuft || !projekt) return;
+
+    // Ohne Position zuerst den Nachweis anstellen, dann die Buchung mit dem
+    // Verweis darauf. Die Warteschlange sendet in dieser Reihenfolge; anders
+    // herum liefe die Buchung beim Server in den Fremdschluessel.
+    const nachweisId = laeuft.position
+      ? null
+      : await nachweisAnstellen({
+          projektId: projekt.id,
+          mitarbeiterId,
+          text: nachweis.text,
+          foto: nachweis.foto,
+        });
+
     await anstellen("zeiteintrag", {
       id: crypto.randomUUID(),
       projekt_id: projekt.id,
@@ -40,8 +55,9 @@ export function Zeiterfassung({
       beginn: laeuft.beginn,
       ende: new Date().toISOString(),
       pause_minuten: 0,
-      taetigkeit,
+      taetigkeit: laeuft.position ? taetigkeit : nachweis.text,
       position_id: laeuft.position,
+      nachweis_id: nachweisId,
     });
     warteschlangeGeaendert();
     setzeLaeuft(null);
@@ -64,10 +80,13 @@ export function Zeiterfassung({
 
   return (
     <>
-      <Warteschlange />
-
       {laeuft && projekt ? (
-        <LaufendeZeit projekt={projekt} beginn={laeuft.beginn} beiStopp={stoppen} />
+        <LaufendeZeit
+          projekt={projekt}
+          beginn={laeuft.beginn}
+          ohnePosition={laeuft.position === null}
+          beiStopp={stoppen}
+        />
       ) : (
         <div className="karte gestapelt">
           <h2 className="kartentitel">Zeit erfassen</h2>
@@ -159,29 +178,50 @@ export function Zeiterfassung({
 function LaufendeZeit({
   projekt,
   beginn,
+  ohnePosition,
   beiStopp,
 }: {
   projekt: Projekt;
   beginn: string;
-  beiStopp: (taetigkeit: string) => void;
+  ohnePosition: boolean;
+  beiStopp: (taetigkeit: string, nachweis: NachweisStand) => void;
 }) {
   const [taetigkeit, setzeTaetigkeit] = useState("");
+  const [nachweis, setzeNachweis] = useState<NachweisStand>(LEERER_NACHWEIS);
   const seit = new Date(beginn).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+
+  // Ohne Position ist die Notiz aus dem Nachweisblock die Taetigkeit - zweimal
+  // dasselbe eintippen wuerde niemand.
+  const fertig = ohnePosition ? nachweisReicht(nachweis.text, nachweis.foto) : true;
 
   return (
     <div className="karte gestapelt">
       <h2 className="kartentitel">Läuft seit {seit}</h2>
-      <p className="zusatz">{projekt.text}</p>
-      <label className="eingabe">
-        <span>Was wurde gemacht?</span>
-        <input
-          className="feld"
-          value={taetigkeit}
-          onChange={(e) => setzeTaetigkeit(e.target.value)}
-          placeholder="z. B. Rohinstallation Bad"
-        />
-      </label>
-      <button type="button" className="taste taste-primaer taste-baustelle" onClick={() => beiStopp(taetigkeit)}>
+      <p className="zusatz">
+        {projekt.text}
+        {ohnePosition && " · keine passende Position"}
+      </p>
+
+      {!ohnePosition && (
+        <label className="eingabe">
+          <span>Was wurde gemacht?</span>
+          <input
+            className="feld"
+            value={taetigkeit}
+            onChange={(e) => setzeTaetigkeit(e.target.value)}
+            placeholder="z. B. Rohinstallation Bad"
+          />
+        </label>
+      )}
+
+      {ohnePosition && <Nachweis stand={nachweis} beiAenderung={setzeNachweis} />}
+
+      <button
+        type="button"
+        className="taste taste-primaer taste-baustelle"
+        onClick={() => beiStopp(taetigkeit, nachweis)}
+        disabled={!fertig}
+      >
         Stopp
       </button>
     </div>
@@ -206,9 +246,16 @@ function Nachtragen({
   const [pause, setzePause] = useState("30");
   const [taetigkeit, setzeTaetigkeit] = useState("");
   const [position, setzePosition] = useState("");
+  const [nachweis, setzeNachweis] = useState<NachweisStand>(LEERER_NACHWEIS);
   const [fehler, setzeFehler] = useState("");
 
   const frueheste = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+  const ohnePosition = position === "";
+
+  // Ohne Position ist die Notiz aus dem Nachweisblock die Taetigkeit. Zwei
+  // Felder fuer dasselbe waeren nicht nur laestig — man fuellt eins aus, das
+  // andere bleibt leer, und hinterher steht in der Akte das Falsche.
+  const fertig = ohnePosition ? nachweisReicht(nachweis.text, nachweis.foto) : true;
 
   async function speichern() {
     if (bis <= von) {
@@ -216,6 +263,16 @@ function Nachtragen({
       return;
     }
     setzeFehler("");
+
+    const nachweisId = ohnePosition
+      ? await nachweisAnstellen({
+          projektId: projekt.id,
+          mitarbeiterId,
+          text: nachweis.text,
+          foto: nachweis.foto,
+        })
+      : null;
+
     await anstellen("zeiteintrag", {
       id: crypto.randomUUID(),
       projekt_id: projekt.id,
@@ -223,8 +280,9 @@ function Nachtragen({
       beginn: new Date(`${tag}T${von}`).toISOString(),
       ende: new Date(`${tag}T${bis}`).toISOString(),
       pause_minuten: Number(pause) || 0,
-      taetigkeit,
+      taetigkeit: ohnePosition ? nachweis.text : taetigkeit,
       position_id: position || null,
+      nachweis_id: nachweisId,
     });
     warteschlangeGeaendert();
     beiFertig();
@@ -269,11 +327,25 @@ function Nachtragen({
           ))}
         </select>
       </label>
-      <label className="eingabe">
-        <span>Tätigkeit</span>
-        <input className="feld" value={taetigkeit} onChange={(e) => setzeTaetigkeit(e.target.value)} />
-      </label>
-      <button type="button" className="taste taste-primaer" onClick={speichern}>
+      {!ohnePosition && (
+        <label className="eingabe">
+          <span>Tätigkeit</span>
+          <input
+            className="feld"
+            value={taetigkeit}
+            onChange={(e) => setzeTaetigkeit(e.target.value)}
+          />
+        </label>
+      )}
+
+      {ohnePosition && <Nachweis stand={nachweis} beiAenderung={setzeNachweis} />}
+
+      <button
+        type="button"
+        className="taste taste-primaer"
+        onClick={speichern}
+        disabled={!fertig}
+      >
         Nachtragen
       </button>
     </div>

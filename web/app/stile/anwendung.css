@@ -1,0 +1,169 @@
+/* Aufbau der Anwendung. Alles Sichtbare kommt aus basis.css und den Tokens —
+   hier steht nur, wie die Flaechen zueinander liegen. */
+
+.rahmen {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+/* -- Kopfzeile ------------------------------------------------------------ */
+.kopf {
+  display: flex; align-items: center; gap: var(--abstand-4);
+  padding: var(--abstand-3) var(--abstand-5);
+  background: var(--flaeche);
+  border-bottom: 1px solid var(--rahmen);
+}
+.kopf-marke {
+  font-family: var(--schriftart-anzeige); font-weight: 700;
+  font-size: 20px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--schrift);
+}
+.kopf-rest { margin-left: auto; display: flex; align-items: center; gap: var(--abstand-3); }
+
+/* -- Navigation ----------------------------------------------------------- */
+.navigation { display: flex; gap: var(--abstand-2); flex-wrap: wrap; }
+.navigation a {
+  display: inline-flex; align-items: center;
+  min-height: var(--ziel-navigation);
+  padding: 0 var(--abstand-4);
+  border-radius: var(--radius);
+  color: var(--schrift-gedaempft); font-weight: 600; text-decoration: none;
+}
+.navigation a:hover { background: var(--flaeche-gehoben); text-decoration: none; }
+.navigation a[aria-current="page"] {
+  background: var(--akzent-grund); color: var(--akzent-schrift);
+}
+
+/* -- Inhalt --------------------------------------------------------------- */
+.inhalt {
+  padding: var(--abstand-6) var(--abstand-5);
+  max-width: 1180px; width: 100%; margin: 0 auto;
+  display: flex; flex-direction: column; gap: var(--abstand-5);
+}
+.mitte {
+  min-height: 100dvh;
+  display: grid; place-items: center;
+  padding: var(--abstand-5);
+}
+.mitte > * { width: 100%; max-width: 30rem; }
+
+/* -- Formulare ------------------------------------------------------------ */
+.formular { display: flex; flex-direction: column; gap: var(--abstand-4); }
+.eingabe { display: flex; flex-direction: column; gap: var(--abstand-2); }
+.eingabe > label {
+  font-family: var(--schriftart-anzeige); font-weight: 600;
+  font-size: var(--groesse-gruppenlabel); letter-spacing: var(--laufweite-label);
+  color: var(--schrift-schwach); text-transform: uppercase;
+}
+.feldfehler { color: var(--gefahr); font-size: var(--groesse-zusatz); font-weight: 600; }
+
+/* Ein Abbruch wird gezeigt, nicht verschluckt. */
+.hinweis {
+  border-left: 3px solid var(--gefahr);
+  background: var(--gefahr-grund);
+  color: var(--gefahr);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--abstand-3) var(--abstand-4);
+  font-weight: 600;
+}
+.hinweis-freundlich {
+  border-left-color: var(--akzent-flaeche);
+  background: var(--akzent-grund);
+  color: var(--akzent-schrift);
+}
+
+.reihe { display: flex; align-items: center; gap: var(--abstand-3); flex-wrap: wrap; }
+.gestapelt { display: flex; flex-direction: column; gap: var(--abstand-4); }
+.leer { color: var(--schrift-gedaempft); }
+
+/* Der Umschalter traegt ein Symbol und einen Text fuer Vorlesewerkzeuge. */
+.thema-taste {
+  min-height: var(--ziel-minimum); min-width: var(--ziel-minimum);
+  padding: 0 var(--abstand-3);
+  background: transparent; color: var(--schrift);
+  border: 1px solid var(--rahmen-bedienelement); border-radius: var(--radius);
+  font-size: 17px; cursor: pointer;
+}
+
+/* Nur fuer Vorlesewerkzeuge sichtbar. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* Karte und Eingabefeld teilen sich in basis.css dieselbe Flaeche. Steht ein
+   Feld in einer Karte, verschwindet es darin und ist nur noch am Rahmen zu
+   erkennen. Innerhalb einer Karte traegt das Feld deshalb den Grund — hell auf
+   grau am Tag, dunkel auf weniger dunkel in der Nacht. */
+.karte .feld {
+  background: var(--grund);
+}
+
+/* Eine anklickbare Listenzeile. Die Hoehe kommt aus den Tokens, damit sie sich
+   auch mit Handschuhen treffen laesst. */
+.listenzeile {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--abstand-4);
+  min-height: var(--ziel-liste);
+  color: inherit; text-decoration: none;
+}
+.listenzeile:hover { background: var(--flaeche-gehoben); text-decoration: none; }
+
+/* -- Positionen des Leistungsverzeichnisses -------------------------------- */
+.positionszeile { display: flex; flex-direction: column; gap: var(--abstand-3); }
+.positionszeile.gliederung { border-left: 3px solid var(--akzent-flaeche); }
+.positionskopf { display: flex; align-items: center; gap: var(--abstand-3); flex-wrap: wrap; }
+.positionsnummer {
+  min-width: 2.2rem; text-align: right;
+  color: var(--schrift-schwach); font-weight: 600;
+}
+.positionswerte {
+  display: flex; align-items: flex-end; gap: var(--abstand-3); flex-wrap: wrap;
+}
+.positionswerte label { display: flex; flex-direction: column; gap: 4px; width: 7.5rem; }
+.positionswerte .feld { min-height: var(--ziel-minimum); }
+.positionssumme {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-left: auto; text-align: right; min-width: 8rem;
+}
+.positionssumme .zahl { font-size: 17px; font-weight: 600; }
+.kalkulation summary { cursor: pointer; }
+
+/* -- Summenblock ---------------------------------------------------------- */
+.summen { display: flex; flex-direction: column; gap: var(--abstand-2); margin-left: auto; min-width: 16rem; }
+.summenzeile { display: flex; justify-content: space-between; gap: var(--abstand-4); }
+.summenzeile.gesamt {
+  border-top: 1px solid var(--rahmen); padding-top: var(--abstand-2);
+  font-weight: 700; font-size: 17px;
+}
+
+/* -- Positionswahl auf der Baustelle -------------------------------------- */
+/* Volle Breite, 68 px hoch: mit Handschuhen zu treffen. "Keine passende
+   Position" ist genauso gross wie jede Position — sonst waehlen die Monteure
+   irgendeine, und der Waechter bekommt nichts zu sehen. */
+.positionswahl {
+  width: 100%; justify-content: flex-start; text-align: left;
+  min-height: var(--ziel-liste); gap: var(--abstand-3);
+}
+.positionswahl.ungeklaert {
+  border-color: var(--akzent-flaeche); border-width: 2px;
+  background: var(--akzent-grund); color: var(--akzent-schrift);
+}
+
+/* -- Nachweis zur Buchung ohne Position ----------------------------------- */
+/* Abgesetzt, aber nicht als Warnung: der Monteur hat nichts falsch gemacht.
+   Er meldet, dass das Leistungsverzeichnis die Arbeit nicht abdeckt. */
+.nachweis {
+  border-color: var(--akzent-flaeche);
+  background: var(--akzent-grund);
+}
+
+/* -- Ungeklaerte Leistung ------------------------------------------------- */
+/* Die Karte in der Karte: je Baustelle eine Gruppe, darin die einzelnen
+   Meldungen. Der Betrag steht rechts und liest sich auf einen Blick. */
+.karte .karte {
+  background: var(--flaeche-gehoben);
+  border-color: var(--rahmen);
+}

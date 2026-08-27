@@ -26,6 +26,11 @@ insert into kunde       (id, betrieb_id, name) values ('a1000000-0000-0000-0000-
 insert into projekt     (id, betrieb_id, kunde_id, bezeichnung) values ('a2000000-0000-0000-0000-00000000000a','aaaaaaaa-0000-0000-0000-00000000000a','a1000000-0000-0000-0000-00000000000a','Projekt A');
 insert into mitarbeiter (id, betrieb_id, name) values ('a3000000-0000-0000-0000-00000000000a','aaaaaaaa-0000-0000-0000-00000000000a','Monteur A');
 insert into lieferant   (id, betrieb_id, name) values ('a5000000-0000-0000-0000-00000000000a','aaaaaaaa-0000-0000-0000-00000000000a','Lieferant A');
+-- Eigener Nachweis. Seit 0020 braucht eine Buchung ohne Position einen; ohne
+-- ihn schlaegt unten die Pruefung an, bevor der Fremdschluessel drankommt -
+-- und der Test wuerde die falsche Zusicherung belegen.
+insert into dokumentation (id, betrieb_id, projekt_id, art, text, erfasst_am, erfasst_von) values
+  ('a7000000-0000-0000-0000-00000000000a','aaaaaaaa-0000-0000-0000-00000000000a','a2000000-0000-0000-0000-00000000000a','notiz','Nachweis A',now(),'a3000000-0000-0000-0000-00000000000a');
 
 -- Betrieb B, inklusive festgeschriebener Rechnung
 insert into kunde       (id, betrieb_id, name) values ('b1000000-0000-0000-0000-00000000000b','bbbbbbbb-0000-0000-0000-00000000000b','Kunde B');
@@ -122,8 +127,9 @@ begin
 
   -- 9. Zeiteintrag auf fremden Mitarbeiter
   begin
-    insert into zeiteintrag (id, betrieb_id, mitarbeiter_id, beginn)
-    values (gen_random_uuid(), A, 'b3000000-0000-0000-0000-00000000000b', now());
+    insert into zeiteintrag (id, betrieb_id, mitarbeiter_id, beginn, nachweis_id)
+    values (gen_random_uuid(), A, 'b3000000-0000-0000-0000-00000000000b', now(),
+            'a7000000-0000-0000-0000-00000000000a');
     fehlgeschlagen := fehlgeschlagen || 'zeiteintrag -> fremder mitarbeiter';
   exception when foreign_key_violation or insufficient_privilege or restrict_violation then null;
   end;

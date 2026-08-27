@@ -4,8 +4,13 @@ node_modules/
 .next/
 .open-next/
 
-# Von scripts/stile-holen.mjs erzeugte Kopien der Tokens.
-web/app/stile/*.css
+# Von scripts/stile-holen.mjs erzeugte Kopien der Tokens. Nur diese beiden -
+# anwendung.css daneben ist von Hand geschrieben und gehoert ins Verzeichnis.
+# Ein Muster ueber das ganze Verzeichnis hatte sie stillschweigend mitgenommen:
+# der Bau lief hier weiter, ein frischer Klon haette eine Anwendung ohne
+# Gestaltung erzeugt.
+web/app/stile/tokens.css
+web/app/stile/basis.css
 # Ergebnisse der Oberflaechentests.
 web/test-results/
 web/playwright-report/

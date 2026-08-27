@@ -275,7 +275,7 @@ Netzrückkehr), er verschwand bis zur Übertragung aus der Ansicht, und
 
 ---
 
-### Schritt 6 — Nachtragswächter, Teil 1: Erkennen
+### Schritt 6 — Nachtragswächter, Teil 1: Erkennen ✓ erledigt
 
 **Ziel:** Der Betrieb erfährt **am selben Tag**, dass jemand etwas gemacht hat,
 das nicht beauftragt ist.
@@ -322,6 +322,33 @@ zunächst nur, wo die Einheit passt, und sagt das in der Oberfläche auch.
 **Fallstrick:** Zu viele Meldungen sind so schlecht wie keine. Deshalb
 Euro-Schwelle statt Zählung, Gruppierung je Projekt, und ein Weg, eine Meldung
 mit Begründung als „geklärt" abzulegen — die Begründung landet im Journal.
+
+**Belegt durch**
+- `supabase/tests/11_nachtragswaechter.sql`: drei Regeln an echten Zeilen, dazu
+  die beiden Nichtfälle (105 % meldet nicht; eine m²-Position wird nicht aus
+  Stunden beurteilt), die Nachweispflicht, die Handrechnung 192,50 + 30,00 +
+  124,00 = 346,50 € und die Mandantengrenze **der Sichten** — ohne
+  `security_invoker` liefert eine Sicht alle Mandanten aus.
+- Fünf Mutationen gegengeprüft: Schwelle 110 → 104 %, `security_invoker`
+  entfernt, beide Nachweisregeln entschärft, Betragsformel verfälscht. Jede
+  wurde gefangen.
+- `web/e2e/06_waechter.spec.ts`: „Stopp" bleibt ohne Nachweis gesperrt, eine
+  nachgetragene Schicht erscheint mit 510,00 € (8,5 Std × 60,00) im Büro, und
+  Ablegen ohne Begründung geht nicht.
+
+**Drei Befunde aus der Nachprüfung, jeweils mit Migration behoben**
+- *0021:* `on delete set null` auf `nachweis_id` ließ Postgres den Verweis
+  leeren; erst die Prüfregel fing es ab — mit einer Meldung über `zeiteintrag`,
+  obwohl eine Notiz gelöscht werden sollte. Jetzt RESTRICT: „wird noch
+  verwendet", und die verweisende Tabelle steht dabei.
+- *0022:* Ein einmal gebuchter Artikel war nie wieder löschbar, weil die
+  Entnahme ihre Bezeichnung aus dem Stammsatz bezog. Sie trägt sie jetzt selbst
+  — genau wie den Einkaufspreis, und aus demselben Grund.
+- *Warteschlange:* Sie hing an den drei Erfassungsformularen. Wer nach dem
+  Buchen sofort weiterklickte, brach die Übertragung ab, und auf jeder anderen
+  Seite gab es nichts, was sie wieder aufgenommen hätte. Sie steht jetzt im
+  Layout. Der Prüflauf fiel dadurch von 30 auf 8 Sekunden — er hatte vorher
+  jedes Mal auf eine Übertragung gewartet, die niemand mehr anstieß.
 
 ---
 

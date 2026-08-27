@@ -35,6 +35,7 @@ do $$
 declare
   b uuid; p text; inh uuid;
   v_kunde uuid; v_projekt uuid; v_ma uuid; v_lief uuid; v_beleg uuid; v_pos uuid;
+  v_doku uuid;
 begin
   foreach b in array array['aaaaaaaa-0000-0000-0000-00000000000a'::uuid,
                            'bbbbbbbb-0000-0000-0000-00000000000b'::uuid]
@@ -60,9 +61,16 @@ begin
     insert into beleg_position (betrieb_id, beleg_id, position_nr, bezeichnung, menge, einzelpreis)
       values (b, v_beleg, 1, 'Position ' || upper(p), 10, 100) returning id into v_pos;
     insert into dokumentation (id, betrieb_id, projekt_id, art, text, erfasst_am, erfasst_von)
-      values (gen_random_uuid(), b, v_projekt, 'notiz', 'Notiz ' || upper(p), now(), v_ma);
-    insert into zeiteintrag (id, betrieb_id, projekt_id, mitarbeiter_id, beginn, ende)
-      values (gen_random_uuid(), b, v_projekt, v_ma, now() - interval '3 hours', now());
+      values (gen_random_uuid(), b, v_projekt, 'notiz', 'Notiz ' || upper(p), now(), v_ma)
+      returning id into v_doku;
+    -- Ohne Position braucht die Buchung seit 0020 einen Nachweis.
+    insert into zeiteintrag (id, betrieb_id, projekt_id, mitarbeiter_id, beginn, ende, nachweis_id)
+      values (gen_random_uuid(), b, v_projekt, v_ma, now() - interval '3 hours', now(), v_doku);
+    insert into materialentnahme (id, betrieb_id, projekt_id, bezeichnung, menge, einheit,
+                                  ek_preis, erfasst_am, erfasst_von, nachweis_id)
+      values (gen_random_uuid(), b, v_projekt, 'Kabel ' || upper(p), 5, 'm', 2.50, now(), v_ma, v_doku);
+    insert into klaerung (betrieb_id, gegenstand, gegenstand_id, grund, geklaert_von)
+      values (b, 'position_mehrmenge', v_pos, 'Kulanz ' || upper(p), inh);
     insert into einsatz (betrieb_id, projekt_id, ressource_art, mitarbeiter_id, von, bis)
       values (b, v_projekt, 'mitarbeiter', v_ma, now(), now() + interval '4 hours');
 

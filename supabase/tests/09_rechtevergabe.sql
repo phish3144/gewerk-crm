@@ -122,6 +122,7 @@ declare
     'beleg_summen_neu',
     'betrieb_gruenden',
     'betrieb_loeschen',
+    'einheit_gruppe',        -- aus den Sichten heraus, die security_invoker laufen
     'konto_anlegen',
     'mitglied_aufnehmen',
     'mitglied_entfernen',

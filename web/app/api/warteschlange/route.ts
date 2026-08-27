@@ -6,9 +6,9 @@ import { aktiveZugehoerigkeit } from "@/lib/betrieb";
 // eng: nur diese drei Arten, nur diese Felder, und die Mandantenzuordnung kommt
 // aus der Sitzung — nie aus der Nutzlast.
 const ERLAUBT = {
-  zeiteintrag: ["id", "projekt_id", "mitarbeiter_id", "beginn", "ende", "pause_minuten", "taetigkeit", "position_id"],
+  zeiteintrag: ["id", "projekt_id", "mitarbeiter_id", "beginn", "ende", "pause_minuten", "taetigkeit", "position_id", "nachweis_id"],
   dokumentation: ["id", "projekt_id", "art", "r2_key", "text", "aufmass", "erfasst_am", "erfasst_von"],
-  materialentnahme: ["id", "projekt_id", "artikel_id", "bezeichnung", "menge", "einheit", "position_id", "erfasst_am", "erfasst_von"],
+  materialentnahme: ["id", "projekt_id", "artikel_id", "bezeichnung", "menge", "einheit", "ek_preis", "position_id", "nachweis_id", "erfasst_am", "erfasst_von"],
 } as const;
 
 export async function POST(anfrage: NextRequest) {

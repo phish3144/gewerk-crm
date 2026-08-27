@@ -64,17 +64,26 @@ end $$;
 
 -- Baustellendaten muss der Monteur schreiben duerfen.
 do $$
+declare v_doku uuid;
 begin
   insert into dokumentation (id, betrieb_id, projekt_id, art, text, erfasst_am, erfasst_von)
   values (gen_random_uuid(), 'aaaaaaaa-0000-0000-0000-00000000000a',
           'a2000000-0000-0000-0000-00000000000a', 'notiz', 'Durchbruch fehlt', now(),
-          'a3000000-0000-0000-0000-00000000000a');
-  insert into zeiteintrag (id, betrieb_id, projekt_id, mitarbeiter_id, beginn, ende)
+          'a3000000-0000-0000-0000-00000000000a')
+  returning id into v_doku;
+  -- Ohne Position braucht die Buchung seit 0020 einen Nachweis - hier die
+  -- Notiz von eben. Genau so ist es auch auf der Baustelle gemeint.
+  insert into zeiteintrag (id, betrieb_id, projekt_id, mitarbeiter_id, beginn, ende, nachweis_id)
   values (gen_random_uuid(), 'aaaaaaaa-0000-0000-0000-00000000000a',
           'a2000000-0000-0000-0000-00000000000a', 'a3000000-0000-0000-0000-00000000000a',
-          now() - interval '4 hours', now());
+          now() - interval '4 hours', now(), v_doku);
+  insert into materialentnahme (id, betrieb_id, projekt_id, bezeichnung, menge, einheit,
+                                ek_preis, erfasst_am, erfasst_von, nachweis_id)
+  values (gen_random_uuid(), 'aaaaaaaa-0000-0000-0000-00000000000a',
+          'a2000000-0000-0000-0000-00000000000a', 'Bohrkrone 82 mm', 1, 'Stk', 48.90, now(),
+          'a3000000-0000-0000-0000-00000000000a', v_doku);
 exception when insufficient_privilege then
-  raise exception 'FAIL Monteur kann nicht dokumentieren oder Zeiten erfassen';
+  raise exception 'FAIL Monteur kann nicht dokumentieren, Zeiten oder Material erfassen';
 end $$;
 
 -- --------------------------------------------------------------- Buero ------

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { aktiveZugehoerigkeit, meineZugehoerigkeiten } from "@/lib/betrieb";
 import { ThemaUmschalter } from "@/komponenten/ThemaUmschalter";
+import { Warteschlange } from "@/komponenten/Warteschlange";
 import { BetriebWaehler } from "./BetriebWaehler";
 
 // Welche Bereiche eine Rolle sieht. Das ist Bequemlichkeit, keine Sicherheit —
@@ -11,18 +12,23 @@ const bereiche = {
   monteur: [
     { pfad: "/uebersicht", text: "Übersicht" },
     { pfad: "/zeit", text: "Zeiten" },
+    { pfad: "/material", text: "Material" },
     { pfad: "/projekte", text: "Projekte" },
   ],
   buero: [
     { pfad: "/uebersicht", text: "Übersicht" },
+    { pfad: "/ungeklaert", text: "Ungeklärt" },
     { pfad: "/zeit", text: "Zeiten" },
+    { pfad: "/material", text: "Material" },
     { pfad: "/kunden", text: "Kunden" },
     { pfad: "/projekte", text: "Projekte" },
     { pfad: "/belege", text: "Belege" },
   ],
   inhaber: [
     { pfad: "/uebersicht", text: "Übersicht" },
+    { pfad: "/ungeklaert", text: "Ungeklärt" },
     { pfad: "/zeit", text: "Zeiten" },
+    { pfad: "/material", text: "Material" },
     { pfad: "/kunden", text: "Kunden" },
     { pfad: "/projekte", text: "Projekte" },
     { pfad: "/belege", text: "Belege" },
@@ -65,6 +71,15 @@ export default async function BetriebsLayout({ children }: { children: React.Rea
           </form>
         </div>
       </header>
+
+      {/* Einmal fuer die ganze Anwendung, nicht je Erfassungsseite.
+          Vorher hing die Warteschlange an den drei Formularen: wer nach dem
+          Buchen sofort weiterklickte, brach die laufende Uebertragung ab, und
+          auf jeder anderen Seite gab es nichts mehr, was sie wieder aufgenommen
+          haette. Der Eintrag lag dann bis zum naechsten Besuch der
+          Erfassungsseite im Geraet - genau der stille Vertrauensbruch, den die
+          Anzeige eigentlich verhindern soll. */}
+      <Warteschlange />
 
       <main className="inhalt">{children}</main>
     </div>
