@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { serverKlient, angemeldeteBenutzerin } from "@/lib/supabase/server";
 import { aktiveZugehoerigkeit } from "@/lib/betrieb";
 import { fehlertext } from "@/lib/fehler";
@@ -45,4 +46,43 @@ export async function klaeren(
   revalidatePath("/ungeklaert");
   revalidatePath("/uebersicht");
   return {};
+}
+
+
+// Aus einer oder mehreren Meldungen wird ein Nachtragsentwurf. Die eigentliche
+// Arbeit macht nachtrag_anlegen() in der Datenbank: Positionen aus den
+// Ist-Mengen, Bezug auf den Hauptauftrag, Buchungen umhaengen und
+// Klaerungsvermerke schreiben - alles in einer Transaktion. Bricht ein Schritt
+// ab, ist auch der halbe Nachtrag weg.
+export async function nachtragErzeugen(
+  _stand: { fehler?: string } | undefined,
+  formular: FormData,
+): Promise<{ fehler?: string }> {
+  const projektId = String(formular.get("projekt_id") ?? "");
+  const auswahl = formular.getAll("meldung").map(String);
+
+  if (auswahl.length === 0) {
+    return { fehler: "Bitte mindestens eine Meldung auswählen." };
+  }
+
+  const meldungen = auswahl.map((eintrag) => {
+    const trenner = eintrag.indexOf(":");
+    return {
+      gegenstand: eintrag.slice(0, trenner),
+      gegenstand_id: eintrag.slice(trenner + 1),
+    };
+  });
+
+  const supabase = await serverKlient();
+  const { data, error } = await supabase.rpc("nachtrag_anlegen", {
+    p_projekt: projektId,
+    p_meldungen: meldungen,
+  });
+  if (error) return { fehler: fehlertext(error) };
+
+  revalidatePath("/ungeklaert");
+  revalidatePath("/belege");
+  // Weiter zum Entwurf: dort werden die tatsaechlich erforderlichen Kosten
+  // eingetragen. Ohne sie laesst die Datenbank das Festschreiben nicht zu.
+  redirect(`/belege/${data as string}`);
 }

@@ -61,6 +61,32 @@ export default async function BelegSeite({ params }: { params: Promise<{ id: str
         </div>
       </div>
 
+      {beleg.art === "nachtrag" && entwurf && (
+        <p className="hinweis" role="status">
+          Die Positionen kommen aus den Ist-Mengen und stehen bewusst ohne Preis da. Ab 110 % der
+          Sollmenge zählen nach der Rechtsprechung des BGH zu § 2 Abs. 3 Nr. 2 VOB/B die
+          <strong> tatsächlich erforderlichen Kosten</strong> der Mehrmenge, nicht der
+          fortgeschriebene alte Einheitspreis. Festschreiben lässt sich der Nachtrag erst, wenn
+          jeder Preis gesetzt ist.
+        </p>
+      )}
+
+      {beleg.art === "nachtrag" && (
+        <div className="reihe">
+          <Link
+            className="taste taste-sekundaer"
+            href={`/bedenken/neu?projekt=${beleg.projekt_id}&nachtrag=${beleg.id}`}
+          >
+            Bedenken anzeigen (§ 4 Abs. 3 VOB/B)
+          </Link>
+          {beleg.vorgaenger_id && (
+            <Link className="taste taste-sekundaer" href={`/belege/${beleg.vorgaenger_id}`}>
+              Zum Hauptauftrag
+            </Link>
+          )}
+        </div>
+      )}
+
       {!entwurf && (
         <p className="hinweis hinweis-freundlich">
           Dieser Beleg ist festgeschrieben und damit unveränderlich (GoBD). Eine Korrektur

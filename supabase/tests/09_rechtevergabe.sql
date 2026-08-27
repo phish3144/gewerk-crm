@@ -127,6 +127,7 @@ declare
     'mitglied_aufnehmen',
     'mitglied_entfernen',
     'mitglied_rolle_setzen',
+    'nachtrag_anlegen',
     'loeschung_laeuft_fuer',   -- aus Invoker-Triggern heraus aufgerufen, siehe 0017
     'meine_betriebe',
     'meine_betriebe_inhaber',

@@ -3,6 +3,7 @@ import { serverKlient } from "@/lib/supabase/server";
 import { alsEuro, alsMenge, alsDatum } from "@/lib/geld";
 import { Leer, Abbruch } from "@/komponenten/Zustand";
 import { Klaeren } from "./Klaeren";
+import { Meldungsgruppe, MeldungsHaken } from "./Meldungsgruppe";
 
 type Meldung = {
   projekt_id: string | null;
@@ -111,6 +112,12 @@ export default async function UngeklaertSeite() {
                 </span>
               </div>
 
+              <Meldungsgruppe
+                projektId={projektId}
+                betraege={Object.fromEntries(
+                  posten.map((m) => [`${m.gegenstand}:${m.gegenstand_id}`, Number(m.betrag ?? 0)]),
+                )}
+              >
               {posten.map((m) => {
                 const nachweis = m.nachweis_id ? nachweisVon.get(m.nachweis_id) : null;
                 return (
@@ -163,10 +170,17 @@ export default async function UngeklaertSeite() {
                       </div>
                     )}
 
-                    <Klaeren gegenstand={m.gegenstand} gegenstandId={m.gegenstand_id} />
+                    <div className="reihe" style={{ justifyContent: "space-between" }}>
+                      <MeldungsHaken
+                        schluessel={`${m.gegenstand}:${m.gegenstand_id}`}
+                        titel={m.bezeichnung}
+                      />
+                      <Klaeren gegenstand={m.gegenstand} gegenstandId={m.gegenstand_id} />
+                    </div>
                   </div>
                 );
               })}
+              </Meldungsgruppe>
             </div>
           ))}
         </>

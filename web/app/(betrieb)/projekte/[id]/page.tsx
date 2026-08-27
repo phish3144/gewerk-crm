@@ -33,6 +33,9 @@ export default async function ProjektBearbeiten({
         <Link className="taste taste-sekundaer" href={`/projekte/${id}/doku`}>
           Baustellendoku
         </Link>
+        <Link className="taste taste-sekundaer" href={`/bedenken/neu?projekt=${id}`}>
+          Bedenken anzeigen
+        </Link>
       </div>
 
       {gespeichert && (

@@ -1,6 +1,7 @@
 export const BELEG_ART_TEXT: Record<string, string> = {
   angebot: "Angebot",
   auftrag: "Auftrag",
+  nachtrag: "Nachtrag",
   abschlagsrechnung: "Abschlagsrechnung",
   teilrechnung: "Teilrechnung",
   schlussrechnung: "Schlussrechnung",

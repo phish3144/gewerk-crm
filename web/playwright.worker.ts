@@ -10,7 +10,8 @@ const BROWSER = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 // ungeprueft.
 export default defineConfig({
   testDir: "./e2e",
-  testMatch: /05_doku\.spec\.ts/,
+  // Alles, was die R2-Bindung braucht.
+  testMatch: /(05_doku|08_bedenken_foto)\.spec\.ts/,
   timeout: 60_000,
   workers: 1,
   reporter: [["list"]],

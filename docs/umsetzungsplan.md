@@ -352,7 +352,7 @@ mit Begründung als „geklärt" abzulegen — die Begründung landet im Journal
 
 ---
 
-### Schritt 7 — Nachtragswächter, Teil 2: Handeln
+### Schritt 7 — Nachtragswächter, Teil 2: Handeln ✓ erledigt
 
 **Ziel:** Von der Meldung zum abrechenbaren Nachtrag in unter zwei Minuten.
 
@@ -372,6 +372,43 @@ Preisermittlung maßgeblich, sondern die **tatsächlich erforderlichen Kosten** 
 Mehrmenge. Die App darf den alten Einheitspreis also nicht stillschweigend
 fortschreiben — sie muss zur Eingabe der tatsächlichen Kosten auffordern und
 kenntlich machen, warum.
+
+**Belegt durch**
+- `supabase/tests/12_nachtrag.sql`: aus zwei Meldungen werden zwei Positionen
+  mit den Ist-Mengen, die Buchungen hängen danach daran, `vorgaenger_id` zeigt
+  auf den Hauptauftrag, ohne Preis bricht das Festschreiben ab, mit Preis
+  kommt `NA-2026-00001` heraus, und der Nachtrag zählt im Leistungsstand als
+  Soll — sonst meldete der Wächter die Mehrmenge, die er gerade zum Nachtrag
+  gemacht hat, sofort wieder.
+- `web/e2e/07_nachtrag.spec.ts`: derselbe Weg durch die Oberfläche, vom Haken
+  an der Meldung bis zum versendeten Schriftstück — **19 Sekunden**, gemessen,
+  nicht geschätzt. Die zwei Minuten aus dem Ziel sind komfortabel eingehalten.
+- Die Unveränderlichkeit ist an der Datenbank geprüft, nicht nur am Formular:
+  ein `update` auf eine versendete Anzeige scheitert auch am direkten Zugriff.
+
+**Die Preispflicht steht in der Datenbank.** Jede Nachtragsposition entsteht mit
+Preis null; ein Trigger lässt das Festschreiben erst zu, wenn jemand die
+tatsächlich erforderlichen Kosten eingetragen hat. Eigener Trigger statt
+Änderung an `beleg_festschreiben` — und weil der Abbruch die ganze Transaktion
+zurückrollt, entsteht dabei keine Lücke im Nummernkreis.
+
+**Zwei Befunde aus der Nachprüfung**
+- *`bedenken_versand_vollstaendig` griff nicht.* `btrim(null) <> ''` ergibt
+  NULL, und eine CHECK-Regel gilt als erfüllt, sobald ihr Ausdruck NULL ist —
+  `versendet_am` ließ sich allein setzen, also „versendet, aber niemand weiß
+  wie und an wen". `coalesce` davor. Der Datenbanktest hat es gefunden.
+- *pdf-lib läuft bei abgeschnittenen PNG-Daten in eine Endlosschleife.*
+  Gemessen: ein gültiges PNG ist in 7 ms eingebettet, ein halbiertes kehrt nach
+  20 Sekunden noch nicht zurück — kein Fehler, keine Ausnahme. In einem Worker
+  hängt damit die Anfrage, bis die Laufzeit sie abräumt. Ein halb hochgeladenes
+  Foto hätte die ganze Bedenkenanzeige lahmgelegt. `bildTaugt()` prüft jetzt
+  vorher Kennung und vollständigen Aufbau; `web/e2e/09_pdf_bilder.spec.ts`
+  hält das fest.
+
+**Nebenbei:** `getCloudflareContext()` wirft außerhalb der Worker-Laufzeit,
+statt eine leere Umgebung zu liefern — aus einem fehlenden Dateispeicher wurde
+so ein Serverfehler 500. `lib/dateispeicher.ts` fängt das einmal zentral ab:
+ohne Bucket entsteht das Schriftstück trotzdem, nur ohne Bilder.
 
 ---
 

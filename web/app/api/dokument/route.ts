@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { serverKlient } from "@/lib/supabase/server";
 import { aktiveZugehoerigkeit } from "@/lib/betrieb";
+import { dateispeicher } from "@/lib/dateispeicher";
 
 // Dateien gehen durch den Worker in den R2-Bucket, nicht ueber eine im Browser
 // erzeugte Signatur: dafuer braeuchte der Client S3-Zugangsdaten, und die
@@ -44,8 +44,7 @@ export async function POST(anfrage: NextRequest) {
   const endung = datei.type === "image/png" ? "png" : datei.type === "image/webp" ? "webp" : "jpg";
   const schluessel = `${aktiv.betrieb_id}/${projekt_id}/${crypto.randomUUID()}.${endung}`;
 
-  const { env } = getCloudflareContext();
-  const eimer = (env as unknown as { DOKUMENTE?: R2Bucket }).DOKUMENTE;
+  const eimer = dateispeicher();
   if (!eimer) {
     return NextResponse.json(
       { fehler: "Der Dateispeicher ist in dieser Umgebung nicht angebunden." },
@@ -76,8 +75,7 @@ export async function GET(anfrage: NextRequest) {
     return new NextResponse("Nicht gefunden", { status: 404 });
   }
 
-  const { env } = getCloudflareContext();
-  const eimer = (env as unknown as { DOKUMENTE?: R2Bucket }).DOKUMENTE;
+  const eimer = dateispeicher();
   if (!eimer) return new NextResponse("Kein Dateispeicher", { status: 503 });
 
   const objekt = await eimer.get(schluessel);
