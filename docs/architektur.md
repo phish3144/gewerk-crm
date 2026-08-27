@@ -62,6 +62,14 @@ Kostentreiber, nicht Storage. Bei R2 ist er strukturell null.
 | Adresse | https://gewerk-crm.f3x.workers.dev |
 | Konto | `d217dfbf7039817de7c3ad5e2deee9ab` |
 | Bindungen | `DOKUMENTE` (R2, `gewerk-crm-storage`, `eu`), `ASSETS` |
+| Letzter Stand | Schritt 1 bis 9 vollstaendig, 26 Migrationen |
+
+Nach dem Ausrollen von Hand nachgesehen — `/anmelden` und `/registrieren`
+antworten mit 200, `/uebersicht` und die Rechnungsendpunkte mit 307 auf die
+Anmeldung, das Stylesheet wird ausgeliefert, und im ausgelieferten HTML steht
+kein Dienstschluessel. Die R2-Bindung bestaetigt der Worker beim Deploy selbst
+mit `gewerk-crm-storage (eu)`; die Jurisdiktion laesst sich nachtraeglich nicht
+aendern, deshalb wird sie bei jedem Ausrollen mitgelesen.
 
 Ausgerollt wird von Hand aus `web/`:
 
