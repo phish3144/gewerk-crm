@@ -124,6 +124,7 @@ declare
     'betrieb_gruenden',
     'betrieb_loeschen',
     'einheit_gruppe',        -- aus den Sichten heraus, die security_invoker laufen
+    'gewaehrleistung_bis',   -- dito
     'konto_anlegen',
     'mitglied_aufnehmen',
     'mitglied_entfernen',

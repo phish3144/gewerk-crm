@@ -458,7 +458,7 @@ und 9.
 
 ---
 
-### Schritt 9 — Übersicht und Fristen
+### Schritt 9 — Übersicht und Fristen ✓ erledigt
 
 **Ziel:** Der Inhaber sieht morgens, was Geld kostet.
 
@@ -470,6 +470,38 @@ und 9.
 **Fertig wenn**
 - Jede Kennzahl ist bis auf die einzelne Zeile aufklappbar
 - Keine Zahl ohne Herkunft
+
+**Belegt durch**
+- Migration 0026: `abnahme` (das Ereignis, an dem die Gewährleistung hängt),
+  `freistellungsbescheinigung` (§ 48b EStG) und drei Sichten — `offene_posten`,
+  `fristen`, `nachkalkulation`. Alle drei liefern **Zeilen, keine Summen**;
+  summiert wird erst in der Anzeige, damit sich jede Zahl aufklappen lässt.
+- `supabase/tests/14_fristen.sql` rechnet jede Kennzahl gegen eine Handrechnung
+  nach und prüft die Mandantengrenze der Sichten.
+- Vier Mutationen gegengeprüft: `security_invoker` entfernt, Skonto vom Brutto
+  statt vom offenen Betrag, VOB-Gewährleistung von vier auf zwei Jahre, und
+  Zahlungen ohne Skontoanteil gezählt.
+- `web/e2e/11_uebersicht.spec.ts` klappt die Karten wirklich auf, folgt einer
+  Zeile bis zum Beleg und prüft, dass die Herkunft die Grundlage nennt
+  (§ 48b EStG, Sicherheitsnummer, Abnahmedatum).
+
+**Die vierte Mutation kam zunächst durch** — der Test hatte keine mit Skonto
+beglichene Rechnung. Ohne den Skontoanteil bliebe eine vollständig bezahlte
+Rechnung für immer als teilweise offen stehen und im Mahnlauf. Der Fall steht
+jetzt im Test.
+
+**Beim Ansehen der fertigen Seite geändert:** die Fristenkarte zeigte nur
+Zahlungsziele — dieselben Rechnungen, die daneben schon unter „Offene Posten"
+standen. Zwei Karten, dieselbe Forderung, und am Ende traut man keiner von
+beiden. Auf der Übersicht bleibt das Zahlungsziel deshalb weg; in der Sicht
+`fristen` ist es enthalten, denn eine Frist ist es.
+
+**Zur Freistellungsbescheinigung, ausdrücklich:** die Anwendung fragt **nicht**
+automatisch beim BZSt ab. Das EIBE-Portal ist ein Portal mit Registrierung,
+keine offene Schnittstelle. Geführt werden Sicherheitsnummer und Ablauf, und
+erinnert wird rechtzeitig — das ist der ehrliche Funktionsumfang, und er steht
+so auch im Migrationskommentar, damit später niemand eine Prüfung vermutet, die
+es nicht gibt.
 
 ---
 

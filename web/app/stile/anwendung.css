@@ -167,3 +167,26 @@
   background: var(--flaeche-gehoben);
   border-color: var(--rahmen);
 }
+
+/* -- Uebersicht ------------------------------------------------------------ */
+/* Drei Kennzahlen nebeneinander, auf dem Handy untereinander. Jede laesst sich
+   aufklappen - eine Zahl ohne Herkunft wird nicht geglaubt. */
+.kennzahlreihe {
+  display: grid; gap: var(--abstand-4);
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+}
+.kennzahlkarte.ton-warnung { border-color: var(--akzent-flaeche); }
+.kennzahlkarte.ton-gefahr  { border-color: var(--gefahr); }
+.kennzahlkarte summary { cursor: pointer; padding: var(--abstand-2) 0; }
+
+.herkunft { margin-top: var(--abstand-3); gap: var(--abstand-3); }
+.herkunftzeile {
+  display: flex; justify-content: space-between; gap: var(--abstand-3);
+  align-items: flex-start; color: inherit; text-decoration: none;
+  padding: var(--abstand-2) 0;
+  border-top: 1px solid var(--rahmen);
+}
+.herkunftzeile:first-child { border-top: 0; }
+a.herkunftzeile:hover { background: var(--flaeche-gehoben); text-decoration: none; }
+.herkunftzeile .zahl { text-align: right; white-space: nowrap; }
+.ueberzogen { color: var(--gefahr); }
