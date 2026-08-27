@@ -10,6 +10,7 @@ import {
   istEntwurf,
 } from "@/lib/beleg";
 import { alsDatum, alsEuro } from "@/lib/geld";
+import { Absetzung, RechnungAusAuftrag, Zahlungen } from "./Rechnungsweg";
 
 export default async function BelegSeite({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,6 +29,22 @@ export default async function BelegSeite({ params }: { params: Promise<{ id: str
     .select("*")
     .eq("beleg_id", id)
     .order("position_nr");
+
+  // Zahlungen und Absetzungen gehoeren zur Rechnung, nicht zum Beleg allgemein.
+  const istRechnung = ["abschlagsrechnung", "teilrechnung", "schlussrechnung"].includes(beleg.art);
+  const { data: zahlungen } = istRechnung
+    ? await supabase
+        .from("zahlung")
+        .select("id, vereinnahmt_am, betrag_brutto, art, status_rc")
+        .eq("beleg_id", id)
+        .order("vereinnahmt_am")
+    : { data: [] };
+  const { data: absetzungen } = beleg.art === "schlussrechnung"
+    ? await supabase.from("beleg_anrechnung").select("id").eq("schlussrechnung_id", id)
+    : { data: [] };
+
+  const eingegangen = (zahlungen ?? []).reduce((s, z) => s + Number(z.betrag_brutto ?? 0), 0);
+  const abgesetzt = (absetzungen ?? []).length;
 
   const kunde = beleg.kunde as unknown as { name: string } | null;
   const projekt = beleg.projekt as unknown as { bezeichnung: string } | null;
@@ -119,6 +136,53 @@ export default async function BelegSeite({ params }: { params: Promise<{ id: str
         positionen={(positionen ?? []) as Position[]}
         gesperrt={!entwurf}
       />
+
+      {/* Aus dem festgeschriebenen Auftrag entsteht die Rechnung. Aus einem
+          Entwurf nicht: er ist noch nicht beauftragt. */}
+      {beleg.art === "auftrag" && !entwurf && <RechnungAusAuftrag auftragId={beleg.id} />}
+
+      {beleg.art === "schlussrechnung" && entwurf && (
+        <Absetzung belegId={beleg.id} anzahl={abgesetzt} />
+      )}
+
+      {istRechnung && !entwurf && (
+        <>
+          <div className="reihe">
+            <a
+              className="taste taste-primaer"
+              href={`/api/rechnung/${beleg.id}/pdf`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Rechnung als PDF
+            </a>
+            <a
+              className="taste taste-sekundaer"
+              href={`/api/rechnung/${beleg.id}/xml`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              ZUGFeRD-Datensatz
+            </a>
+          </div>
+          <p className="zusatz">
+            Das PDF trägt den ZUGFeRD-Datensatz eingebettet mit sich — Sichtfassung und
+            strukturierte Daten sind dieselbe Datei und stammen aus derselben Quelle.
+          </p>
+
+          <Zahlungen
+            belegId={beleg.id}
+            zahlungen={(zahlungen ?? []).map((z) => ({
+              id: z.id,
+              vereinnahmt_am: z.vereinnahmt_am,
+              betrag_brutto: z.betrag_brutto,
+              art: z.art,
+              status_rc: z.status_rc,
+            }))}
+            offen={Math.round((Number(beleg.brutto ?? 0) - eingegangen) * 100) / 100}
+          />
+        </>
+      )}
     </>
   );
 }

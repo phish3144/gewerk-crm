@@ -189,6 +189,26 @@ blockiert:
    Meldungen klaeren", mit genau diesem Satz. Beim Aufraeumen der Pruefdaten
    aufgefallen.
 
+8. **Das erzeugte PDF ist noch kein PDF/A-3.** ZUGFeRD verlangt den
+   PDF/A-3-Rahmen: eingebettete Schriften, ein Ausgabe-Absichtsprofil (Output
+   Intent mit ICC) und PDF/A-Kennung im XMP. Erzeugt wird bisher ein
+   gewoehnliches PDF 1.7 mit korrekt eingebettetem Datensatz
+   (`/AFRelationship /Alternative`, `zugferd-invoice.xml`). Fuer den Versand an
+   ein Empfaengersystem, das den strukturierten Teil ausliest, reicht das;
+   fuer die Archivzusage von PDF/A nicht. Was fehlt, ist bekannt und
+   nachruestbar: eine freie Schrift einbetten (pdf-lib kann das ueber fontkit),
+   sRGB-Profil als Output Intent, XMP-Block. Bewusst nicht heute gemacht - die
+   Schrift kostet rund 700 KB im Worker-Bundle, und die Entscheidung, welche,
+   gehoert zum Erscheinungsbild.
+9. **Dateiname des eingebetteten Datensatzes.** ZUGFeRD 2.0.1 schreibt
+   `zugferd-invoice.xml` vor, ZUGFeRD 2.1 und Factur-X `factur-x.xml`. Die
+   Profilkennung, die wir setzen, ist die gemeinsame
+   (`urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic`). Verwendet
+   wird `zugferd-invoice.xml` entsprechend dem Ziel 2.0.1. Die Spezifikation
+   ist nur nach Registrierung abrufbar (siehe Punkt 3), deshalb ungeprueft, ob
+   gaengige Lesegeraete beide Namen annehmen. Vor dem ersten echten Versand
+   klaeren.
+
 Vier der fuenf verworfenen Aussagen betreffen die EN-16931-Abbildung von
 Einbehalten und Anzahlungen. Die Haeufung ist kein Zufall: die Norm hat dort
 eine Luecke.

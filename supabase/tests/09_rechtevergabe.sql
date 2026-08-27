@@ -118,6 +118,7 @@ end $$;
 do $$
 declare
   erlaubt text[] := array[
+    'abschlaege_anrechnen',
     'beleg_festschreiben',
     'beleg_summen_neu',
     'betrieb_gruenden',

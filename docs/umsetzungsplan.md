@@ -416,7 +416,7 @@ ohne Bucket entsteht das Schriftstück trotzdem, nur ohne Bilder.
 
 ---
 
-### Schritt 8 — Rechnung, PDF, E-Rechnung
+### Schritt 8 — Rechnung, PDF, E-Rechnung ✓ erledigt
 
 **Ziel:** Geld anfordern, rechtssicher.
 
@@ -429,6 +429,32 @@ ohne Bucket entsteht das Schriftstück trotzdem, nur ohne Bilder.
 - Schlussrechnung mit zwei Abschlägen: Absetzung stimmt, § 14c-Trigger greift bei Fehlversuch
 - Die erzeugte XML besteht einen externen Validator (manuell, der Java-Validator bleibt vertagt)
 - PDF und XML weichen inhaltlich nicht voneinander ab — gleiche Quelle, ein Test vergleicht sie
+
+**Belegt durch**
+- `supabase/tests/13_rechnungsweg.sql`: Abschlag über 10.000 € netto, vereinnahmt,
+  Schlussrechnung über 25.000 €. Ohne Absetzung bricht das Festschreiben ab —
+  genau der Fehler, der die Umsatzsteuer auf die Anzahlung ein zweites Mal
+  kostet. Mit Absetzung: `RE-2026-00001`, Zahlbetrag 17.850,00 €, und ein
+  zweiter Aufruf verdoppelt nichts.
+- `web/e2e/10_rechnung.spec.ts` vergleicht nicht nur „inhaltlich": der im PDF
+  eingebettete Datensatz wird ausgepackt und **zeichengleich** gegen den
+  ausgelieferten XML-Endpunkt geprüft. Auseinanderlaufen ist damit nicht mehr
+  eine Frage der Disziplin, sondern ausgeschlossen.
+- Dazu: Wohlgeformtheit des XML und die Rechenprobe am Datensatz selbst
+  (netto + steuer = brutto, brutto − angerechnet = zahlbar).
+
+**Am erzeugten PDF nachgesehen, zwei Befunde**
+- *Das Eurozeichen fehlte auf jeder Rechnung.* Der Zeichenfilter ließ Latin-1
+  durch, aber WinAnsi ist nicht Latin-1: zwischen 0x80 und 0x9F hat es eigene
+  Zeichen, darunter €. Aus „25.000,00 €" wurde „25.000,00". Nur beim Lesen
+  eines echten PDF zu sehen — kein Test hätte darauf angeschlagen, weil die
+  Ziffern ja stimmten.
+- *Die Summenaufstellung stand linksbündig* und ließ sich nicht überschlagen.
+  Jetzt rechtsbündig untereinander.
+
+**Offen und benannt:** das PDF ist noch kein PDF/A-3 (eingebettete Schrift,
+Output Intent, XMP fehlen) — siehe [offene-fragen.md](offene-fragen.md) Punkt 8
+und 9.
 
 ---
 

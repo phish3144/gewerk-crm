@@ -33,12 +33,29 @@ const ERSATZ: Array<[RegExp, string]> = [
   [/−/g, "-"],
 ];
 
+// WinAnsi ist nicht Latin-1: zwischen 0x80 und 0x9F hat es eigene Zeichen, und
+// eines davon ist das Eurozeichen. Ein Filter auf Latin-1 wirft es weg - und
+// eine Rechnung, auf der "25.000,00" ohne Waehrung steht, ist keine Rechnung.
+// Beim ersten Blick auf ein erzeugtes PDF aufgefallen.
+const ZUSAETZLICH =
+  "\u20AC\u201A\u0192\u201E\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\u017D" +
+  "\u2022\u02DC\u2122\u0161\u203A\u0153\u017E\u0178";
+
 export function winansi(text: string): string {
   let t = text;
   for (const [muster, ersatz] of ERSATZ) t = t.replace(muster, ersatz);
   // Was danach noch uebrig ist und nicht kodierbar waere, faellt weg. Lieber
   // eine Luecke im Schriftstueck als gar kein Schriftstueck.
-  return t.replace(/[^\x20-\x7E -ÿ\n\t]/g, "");
+  return [...t]
+    .filter(
+      (z) =>
+        (z >= "\u0020" && z <= "\u007E") ||
+        (z >= "\u00A0" && z <= "\u00FF") ||
+        z === "\n" ||
+        z === "\t" ||
+        ZUSAETZLICH.includes(z),
+    )
+    .join("");
 }
 
 export async function neueSeite(): Promise<Satzflaeche> {
@@ -168,6 +185,51 @@ export async function bild(f: Satzflaeche, daten: Uint8Array, typ: string) {
   platzSchaffen(f, h + 8);
   f.seite.drawImage(eingebettet, { x: RAND, y: f.y - h, width: b, height: h });
   f.y -= h + 8;
+}
+
+// Eine Tabelle mit festen Spaltenbreiten. Zeilen mit langer Bezeichnung
+// umbrechen innerhalb ihrer Spalte, statt in die naechste zu laufen.
+export function tabelle(
+  f: Satzflaeche,
+  kopf: string[],
+  breiten: number[],
+  zeilen: string[][],
+  { groesse = 9.5, linksbuendig = [1], mitKopf = true } = {},
+) {
+  const zeilenhoehe = groesse * 1.4;
+  // Zahlenspalten rechtsbuendig: alles ausser der zweiten, das ist die
+  // Bezeichnung. Eine Betragsspalte, die links steht, liest sich nicht.
+  const rechts = kopf.map((_, i) => !linksbuendig.includes(i));
+
+  function zeileSetzen(felder: string[], schrift: PDFFont) {
+    // Erst umbrechen, dann die hoechste Zelle bestimmen - sonst ueberlappen
+    // lange Bezeichnungen die naechste Zeile.
+    const teile = felder.map((t, i) => umbrechen(t, schrift, groesse, breiten[i]! - 8));
+    const hoehe = Math.max(...teile.map((t) => t.length)) * zeilenhoehe;
+    platzSchaffen(f, hoehe + 2);
+
+    let x = RAND;
+    for (let i = 0; i < felder.length; i++) {
+      for (const [j, zeile] of teile[i]!.entries()) {
+        const breite = schrift.widthOfTextAtSize(zeile, groesse);
+        f.seite.drawText(zeile, {
+          x: rechts[i] ? x + breiten[i]! - 8 - breite : x,
+          y: f.y - groesse - j * zeilenhoehe,
+          size: groesse,
+          font: schrift,
+          color: rgb(0.1, 0.1, 0.1),
+        });
+      }
+      x += breiten[i]!;
+    }
+    f.y -= hoehe + 2;
+  }
+
+  if (mitKopf) {
+    zeileSetzen(kopf, f.fett);
+    linie(f, 6);
+  }
+  for (const zeile of zeilen) zeileSetzen(zeile, f.normal);
 }
 
 // Unterschriftsfeld: zwei Linien nebeneinander, darunter die Beschriftung.

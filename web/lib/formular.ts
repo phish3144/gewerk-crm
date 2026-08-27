@@ -3,6 +3,9 @@
 export type Ergebnis = {
   fehler?: string;
   feldFehler?: Record<string, string>;
+  // Was gut gegangen ist. Ohne diese Rueckmeldung sieht eine erfolgreiche
+  // Aktion aus wie gar keine - die Nutzerin drueckt noch einmal.
+  hinweis?: string;
 };
 
 type PostgresFehler = { code?: string; message?: string; details?: string };

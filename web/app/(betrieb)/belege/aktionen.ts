@@ -197,3 +197,168 @@ export async function auftragAusAngebot(_vorher: Ergebnis, daten: FormData): Pro
   revalidatePath("/belege");
   redirect(`/belege/${auftrag.id}`);
 }
+
+
+// ------------------------------------------------------------- Rechnungen --
+
+const RECHNUNGSARTEN = ["abschlagsrechnung", "teilrechnung", "schlussrechnung"] as const;
+
+// Aus dem Auftrag wird die Rechnung. Die Positionen werden kopiert, nicht
+// verschoben: der Auftrag bleibt als festgeschriebener Beleg bestehen und ist
+// weiterhin die Soll-Seite des Leistungsstands.
+//
+// Nachtragspositionen kommen mit - das ist der Punkt der ganzen Uebung. Ohne
+// sie waere der Nachtrag zwar erfasst, aber nie berechnet.
+export async function rechnungAusAuftrag(_vorher: Ergebnis, daten: FormData): Promise<Ergebnis> {
+  const auftrag_id = String(daten.get("id") ?? "");
+  const art = String(daten.get("art") ?? "schlussrechnung");
+  if (!(RECHNUNGSARTEN as readonly string[]).includes(art)) {
+    return { fehler: "Unbekannte Rechnungsart." };
+  }
+
+  const aktiv = await aktiveZugehoerigkeit();
+  const person = await angemeldeteBenutzerin();
+  if (!aktiv || !person) return { fehler: "Kein Betrieb ausgewählt." };
+
+  const supabase = await serverKlient();
+  const { data: auftrag, error: lesefehler } = await supabase
+    .from("beleg")
+    .select("*, beleg_position(*)")
+    .eq("id", auftrag_id)
+    .single();
+  if (lesefehler || !auftrag) return { fehler: fehlertext(lesefehler) };
+  if (auftrag.art !== "auftrag") {
+    return { fehler: "Eine Rechnung entsteht aus dem Auftrag, nicht aus einem " + auftrag.art + "." };
+  }
+
+  const { data: rechnung, error } = await supabase
+    .from("beleg")
+    .insert({
+      betrieb_id: aktiv.betrieb_id,
+      kunde_id: auftrag.kunde_id,
+      projekt_id: auftrag.projekt_id,
+      art,
+      betreff: auftrag.betreff,
+      vorgaenger_id: auftrag.id,
+      // § 14 Abs. 4 Nr. 6 UStG: ohne Leistungsdatum laesst die Datenbank keine
+      // Rechnung festschreiben. Heute als Vorschlag, aenderbar solange Entwurf.
+      leistungsdatum: new Date().toISOString().slice(0, 10),
+      erstellt_von: person.id,
+    })
+    .select("id")
+    .single();
+  if (error) return { fehler: fehlertext(error) };
+
+  // Bei der Schlussrechnung gehoeren die Nachtraege dazu, bei einem Abschlag
+  // nicht unbedingt - dort waehlt das Buero die Positionen ohnehin von Hand.
+  const quellen: string[] = [auftrag.id as string];
+  if (art === "schlussrechnung") {
+    const { data: nachtraege } = await supabase
+      .from("beleg")
+      .select("id")
+      .eq("projekt_id", auftrag.projekt_id ?? "")
+      .eq("art", "nachtrag")
+      .neq("status", "entwurf");
+    for (const n of nachtraege ?? []) quellen.push(n.id as string);
+  }
+
+  const { data: positionen } = await supabase
+    .from("beleg_position")
+    .select("*")
+    .in("beleg_id", quellen)
+    .order("beleg_id")
+    .order("position_nr");
+
+  let nr = 0;
+  const zuKopieren = (positionen ?? []).map((p) => ({
+    betrieb_id: aktiv.betrieb_id,
+    beleg_id: rechnung.id,
+    position_nr: ++nr,
+    art: p["art"],
+    artikel_id: p["artikel_id"],
+    bezeichnung: p["bezeichnung"],
+    menge: p["menge"],
+    einheit: p["einheit"],
+    einzelpreis: p["einzelpreis"],
+    rabatt_prozent: p["rabatt_prozent"],
+    steuersatz: p["steuersatz"],
+    lohn_anteil: p["lohn_anteil"],
+    material_anteil: p["material_anteil"],
+    fremdleistung_anteil: p["fremdleistung_anteil"],
+    lohn_minuten: p["lohn_minuten"],
+    gaeb_position: p["gaeb_position"],
+  }));
+  if (zuKopieren.length > 0) {
+    const { error: posFehler } = await supabase.from("beleg_position").insert(zuKopieren);
+    if (posFehler) return { fehler: fehlertext(posFehler) };
+  }
+
+  revalidatePath("/belege");
+  redirect(`/belege/${rechnung.id}`);
+}
+
+// § 14 Abs. 5 Satz 2 UStG: die vereinnahmten Teilentgelte UND die darauf
+// entfallenden Steuerbetraege gehoeren abgesetzt. Wer das unterlaesst, schuldet
+// die Steuer auf die Anzahlungen ein zweites Mal (§ 14c Abs. 1 UStG).
+export async function abschlaegeAnrechnen(_vorher: Ergebnis, daten: FormData): Promise<Ergebnis> {
+  const id = String(daten.get("id") ?? "");
+  const supabase = await serverKlient();
+  const { data, error } = await supabase.rpc("abschlaege_anrechnen", { p_schlussrechnung: id });
+  if (error) return { fehler: fehlertext(error) };
+
+  revalidatePath(`/belege/${id}`);
+  return {
+    hinweis:
+      Number(data) === 0
+        ? "Es gibt keine vereinnahmten Abschlagszahlungen zu dieser Baustelle."
+        : `${data} Abschlagszahlung(en) abgesetzt.`,
+  };
+}
+
+// Die Zahlung ist eine eigene Ebene, keine Spalte am Beleg: der
+// Steuerentstehungszeitpunkt haengt an der Vereinnahmung, nicht am Belegdatum
+// (§ 13 Abs. 1 Nr. 1 Buchst. a Satz 4 UStG).
+export async function zahlungErfassen(_vorher: Ergebnis, daten: FormData): Promise<Ergebnis> {
+  const beleg_id = String(daten.get("beleg_id") ?? "");
+  const vereinnahmt_am = String(daten.get("vereinnahmt_am") ?? "");
+  const brutto = zahl(daten, "betrag_brutto", 0);
+  const satz = zahl(daten, "steuersatz", 19);
+  const art = String(daten.get("art") ?? "abschlag");
+  const rc = daten.get("reverse_charge") === "ja";
+
+  if (!vereinnahmt_am) {
+    return {
+      feldFehler: {
+        vereinnahmt_am:
+          "Das Gutschriftsdatum des Bankkontos, nicht das Buchungsdatum (UStAE 13.6 Abs. 1 Satz 3).",
+      },
+    };
+  }
+  if (brutto <= 0) return { feldFehler: { betrag_brutto: "Der Betrag muss größer als null sein." } };
+
+  const aktiv = await aktiveZugehoerigkeit();
+  if (!aktiv) return { fehler: "Kein Betrieb ausgewählt." };
+
+  // Bei § 13b wird keine Steuer ausgewiesen (§ 14a Abs. 5 Satz 2 UStG); die
+  // Datenbank besteht darauf, und hier wird deshalb gar nicht erst gerechnet.
+  const steuersatz = rc ? 0 : satz;
+  const netto = rc ? brutto : Math.round((brutto / (1 + steuersatz / 100)) * 100) / 100;
+  const steuer = Math.round((brutto - netto) * 100) / 100;
+
+  const supabase = await serverKlient();
+  const { error } = await supabase.from("zahlung").insert({
+    betrieb_id: aktiv.betrieb_id,
+    beleg_id,
+    vereinnahmt_am,
+    betrag_brutto: brutto,
+    entgelt_netto: netto,
+    steuersatz,
+    steuerbetrag: steuer,
+    status_rc: rc ? "rc_13b_nr4" : "kein_rc",
+    art,
+  });
+  if (error) return { fehler: fehlertext(error) };
+
+  revalidatePath(`/belege/${beleg_id}`);
+  return { hinweis: "Zahlung erfasst." };
+}
